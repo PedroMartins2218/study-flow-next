@@ -39,6 +39,18 @@ export const sessaoFocoInputSchema = z.object({
 
 export type SessaoFocoInput = z.infer<typeof sessaoFocoInputSchema>;
 
+export const anotacaoInputSchema = z.object({
+  titulo: z.string().trim().min(1, "Informe o título da anotação").max(140),
+  materia: z.string().trim().max(80).optional().default(""),
+  conteudo: z
+    .string()
+    .trim()
+    .min(1, "Escreva sua anotação")
+    .max(20000, "Anotação longa demais"),
+});
+
+export type AnotacaoInput = z.infer<typeof anotacaoInputSchema>;
+
 export const reservaInputSchema = z.object({
   nome: z.string().trim().min(1, "Informe seu nome").max(120),
   email: z.string().trim().email("E-mail inválido").max(160),

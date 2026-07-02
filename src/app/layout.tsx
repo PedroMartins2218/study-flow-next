@@ -29,6 +29,13 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50">
+        {/* Aplica o tema escuro antes da primeira pintura, evitando "flash" */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('sf_tema')==='escuro')document.documentElement.classList.add('dark')}catch(e){}",
+          }}
+        />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

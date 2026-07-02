@@ -45,6 +45,15 @@ export interface Perfil {
   email: string;
 }
 
+export interface Anotacao {
+  id: string;
+  titulo: string;
+  materia?: string;
+  conteudo: string;
+  criadoEm?: string;
+  atualizadoEm?: string;
+}
+
 export interface Reserva {
   id: string;
   nome: string;

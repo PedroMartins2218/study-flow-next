@@ -17,3 +17,55 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ══ Tema escuro ══
+   Ativado pela classe .dark no <html> (toggle em /configuracoes, persistido
+   em localStorage). Em vez de espalhar variantes dark: por todas as telas,
+   sobrescrevemos aqui os tokens visuais padrão do app (fundos, textos,
+   bordas, anéis). O design usa sempre as mesmas utilities, então estas
+   regras cobrem o painel inteiro de forma consistente. */
+.dark {
+  --background: #0f172a;
+  --foreground: #e2e8f0;
+}
+.dark .bg-white {
+  background-color: #1e293b;
+}
+.dark .bg-slate-50,
+.dark .bg-slate-100 {
+  background-color: #0f172a;
+}
+.dark .text-slate-900 {
+  color: #f1f5f9;
+}
+.dark .text-slate-700 {
+  color: #cbd5e1;
+}
+.dark .text-slate-600,
+.dark .text-slate-500 {
+  color: #94a3b8;
+}
+.dark .ring-slate-200 {
+  --tw-ring-color: #334155;
+}
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-slate-100 {
+  border-color: #334155;
+}
+.dark .bg-slate-900 {
+  background-color: #2563eb;
+}
+.dark .hover\:bg-slate-700:hover {
+  background-color: #1d4ed8;
+}
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-slate-50:hover {
+  background-color: #334155;
+}
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a;
+  color: #e2e8f0;
+}

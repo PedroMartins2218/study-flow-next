@@ -3,6 +3,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { Logo } from "@/components/marketing/Logo";
 
 type Aba = "login" | "cadastro";
 
@@ -81,8 +82,8 @@ export default function LoginPage() {
 
   return (
     <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
-      <h1 className="text-2xl font-semibold text-slate-900">Study Flow</h1>
-      <p className="mt-1 text-sm text-slate-500">
+      <Logo />
+      <p className="mt-3 text-sm text-slate-500">
         Organize seus estudos, acompanhe sua evolução e transforme foco em
         resultado.
       </p>
