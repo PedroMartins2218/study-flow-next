@@ -32,9 +32,14 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
+
+# netlify (token pessoal e pasta de estado local — nunca versionar)
+.netlify-token
+.netlify/
 
 # typescript
 *.tsbuildinfo

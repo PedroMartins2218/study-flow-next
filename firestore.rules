@@ -1,0 +1,40 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Aceita dois formatos de "dono do documento" durante a transição:
+    // - uid do Firebase Auth (novo app, study-flow-next)
+    // - e-mail do usuário (app antigo, dashboard.html, que usa email como ID)
+    // Um uid nunca é igual a um e-mail, então não há risco de colisão.
+    function isOwnerDoc(docId) {
+      return request.auth != null &&
+        (request.auth.uid == docId || request.auth.token.email == docId);
+    }
+
+    // Perfil e dados do usuário: cada usuário só acessa o próprio documento
+    // e as próprias subcoleções (materias, atividades, trabalhos, provas, sessoes).
+    match /usuarios/{docId} {
+      allow read, write: if isOwnerDoc(docId);
+
+      match /{colecao}/{itemId} {
+        allow read, write: if isOwnerDoc(docId);
+      }
+    }
+
+    // Assinatura nunca é decidida ou escrita pelo cliente.
+    // O cliente só pode LER o próprio status; escrita é feita exclusivamente
+    // pelo backend via Firebase Admin SDK (que ignora estas regras).
+    match /assinaturas/{docId} {
+      allow read: if isOwnerDoc(docId);
+      allow write: if false;
+    }
+
+    // Nega qualquer outro acesso por padrão — isto é o que fecha o
+    // "modo de teste" (hoje qualquer usuário autenticado provavelmente
+    // consegue ler/escrever dados de qualquer outro usuário).
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
