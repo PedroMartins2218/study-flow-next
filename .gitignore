@@ -41,6 +41,9 @@ yarn-error.log*
 .netlify-token
 .netlify/
 
+# github (token pessoal para push — nunca versionar)
+.github-token
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
