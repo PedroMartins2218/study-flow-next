@@ -38,3 +38,13 @@ export const sessaoFocoInputSchema = z.object({
 });
 
 export type SessaoFocoInput = z.infer<typeof sessaoFocoInputSchema>;
+
+export const reservaInputSchema = z.object({
+  nome: z.string().trim().min(1, "Informe seu nome").max(120),
+  email: z.string().trim().email("E-mail inválido").max(160),
+  plano: z.string().trim().max(60).optional().default(""),
+  // Campo livre de pesquisa: o que a pessoa mais quer resolver nos estudos.
+  objetivo: z.string().trim().max(500).optional().default(""),
+});
+
+export type ReservaInput = z.infer<typeof reservaInputSchema>;

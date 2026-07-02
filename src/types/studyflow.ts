@@ -45,6 +45,15 @@ export interface Perfil {
   email: string;
 }
 
+export interface Reserva {
+  id: string;
+  nome: string;
+  email: string;
+  plano?: string;
+  objetivo?: string;
+  criadoEm?: string;
+}
+
 export type StatusAssinatura = "ativo" | "inativo" | "expirado" | "trial";
 
 export interface Assinatura {
