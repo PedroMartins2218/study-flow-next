@@ -61,19 +61,19 @@ export function ReservaForm() {
         name="nome"
         required
         placeholder="Seu nome"
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       />
       <input
         name="email"
         type="email"
         required
         placeholder="Seu melhor e-mail"
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       />
       <select
         name="plano"
         defaultValue={PLANOS[0]}
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       >
         {PLANOS.map((p) => (
           <option key={p} value={p}>
@@ -85,7 +85,7 @@ export function ReservaForm() {
         name="objetivo"
         rows={3}
         placeholder="O que você mais quer resolver nos seus estudos? (opcional)"
-        className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
+        className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100"
       />
 
       {erro && (
@@ -95,7 +95,7 @@ export function ReservaForm() {
       <button
         type="submit"
         disabled={enviando}
-        className="w-full rounded-lg bg-slate-900 py-3 text-sm font-semibold text-white transition hover:bg-slate-700 disabled:opacity-60"
+        className="w-full rounded-lg bg-gradient-to-r from-indigo-600 to-violet-600 py-3 text-sm font-semibold text-white shadow-md shadow-indigo-500/20 transition hover:from-indigo-500 hover:to-violet-500 disabled:opacity-60"
       >
         {enviando ? "Enviando..." : "Garantir minha reserva de fundador"}
       </button>
