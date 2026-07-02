@@ -29,6 +29,20 @@ function extrairEmail(body: Record<string, unknown>): string | null {
 }
 
 export async function POST(request: Request) {
+  // DIAGNOSTICO TEMPORARIO: captura qualquer erro e devolve no corpo para
+  // depurar o 500 no ambiente serverless. REMOVER depois de resolver.
+  try {
+    return await handlePost(request);
+  } catch (err) {
+    const e = err as Error;
+    return NextResponse.json(
+      { erroDiagnostico: e?.message ?? String(err), stack: (e?.stack ?? "").split("\n").slice(0, 4) },
+      { status: 500 }
+    );
+  }
+}
+
+async function handlePost(request: Request) {
   const secretEsperado = process.env.KIRVANO_WEBHOOK_SECRET;
   if (secretEsperado) {
     const secretRecebido =
