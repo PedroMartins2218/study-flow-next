@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CountdownTimer } from "@/components/marketing/CountdownTimer";
 import { Logo } from "@/components/marketing/Logo";
 import { ReservaForm } from "@/components/marketing/ReservaForm";
 import { Testimonials } from "@/components/marketing/Testimonials";
@@ -149,6 +150,9 @@ export default function LandingPage() {
           <p className="mt-5 text-xs text-slate-400">
             Sem cartão agora · Cancele quando quiser · Leva 2 minutos
           </p>
+          <div className="mt-10 flex justify-center">
+            <CountdownTimer />
+          </div>
         </div>
       </section>
 
