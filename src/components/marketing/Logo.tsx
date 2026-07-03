@@ -19,12 +19,13 @@ export function Logo({ withWordmark = true, tone = "brand", className }: LogoPro
 
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
-      <Image
-        src={mark}
-        alt=""
-        priority
-        className="h-8 w-auto"
-      />
+      {isLight ? (
+        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white">
+          ST
+        </span>
+      ) : (
+        <Image src={mark} alt="" priority className="h-8 w-auto" />
+      )}
       {withWordmark && (
         <span
           className={`text-lg font-bold tracking-tight ${

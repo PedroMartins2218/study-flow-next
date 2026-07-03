@@ -4,17 +4,24 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { Logo } from "@/components/marketing/Logo";
+import { Icone } from "@/components/ui/Icone";
 
 const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/materias", label: "Matérias" },
-  { href: "/atividades", label: "Atividades" },
-  { href: "/trabalhos", label: "Trabalhos" },
-  { href: "/provas", label: "Provas" },
-  { href: "/caderno", label: "Caderno" },
-  { href: "/graficos", label: "Gráficos" },
-  { href: "/foco", label: "Foco" },
+  { href: "/dashboard", label: "Dashboard", icone: "dashboard" },
+  { href: "/materias", label: "Matérias", icone: "livro" },
+  { href: "/atividades", label: "Atividades", icone: "check" },
+  { href: "/trabalhos", label: "Trabalhos", icone: "arquivo" },
+  { href: "/provas", label: "Provas", icone: "calendario" },
+  { href: "/caderno", label: "Caderno", icone: "caderno" },
+  { href: "/graficos", label: "Gráficos", icone: "grafico" },
+  { href: "/foco", label: "Foco", icone: "alvo" },
 ] as const;
+
+function iniciais(nome: string | null | undefined, email: string | null | undefined) {
+  const base = (nome ?? email ?? "?").trim();
+  const partes = base.split(/[\s@.]+/).filter(Boolean);
+  return (partes[0]?.[0] ?? "?").toUpperCase() + (partes[1]?.[0]?.toUpperCase() ?? "");
+}
 
 export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -28,9 +35,9 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-1">
-      <aside className="hidden w-56 flex-col border-r border-slate-200 bg-white p-4 sm:flex">
-        <div className="mb-6 px-2">
-          <Logo />
+      <aside className="hidden w-60 flex-col bg-slate-950 p-4 sm:flex">
+        <div className="mb-6 px-2 pt-1">
+          <Logo tone="light" />
         </div>
         <nav className="flex flex-1 flex-col gap-1">
           {NAV_ITEMS.map((item) => {
@@ -39,74 +46,86 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
+                className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
                   ativo
-                    ? "bg-slate-900 text-white"
-                    : "text-slate-600 hover:bg-slate-100"
+                    ? "bg-blue-600 text-white"
+                    : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-100"
                 }`}
               >
+                <Icone nome={item.icone} className="h-5 w-5" />
                 {item.label}
               </Link>
             );
           })}
         </nav>
-        <div className="border-t border-slate-200 pt-3 text-xs text-slate-500">
-          <p className="truncate">{user?.email}</p>
-          <Link
-            href="/configuracoes"
-            className={`mt-2 block rounded-lg px-2 py-1.5 text-center text-xs font-medium hover:bg-slate-100 ${
-              pathname === "/configuracoes" ? "text-slate-900" : "text-slate-500"
-            }`}
-          >
-            Configurações
-          </Link>
-          <Link
-            href="/assinatura"
-            className="mt-1 block rounded-lg px-2 py-1.5 text-center text-xs font-medium text-slate-500 hover:bg-slate-100"
-          >
-            Minha assinatura
-          </Link>
-          <button
-            onClick={handleLogout}
-            className="mt-1 w-full rounded-lg border border-slate-300 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Sair
-          </button>
+        <div className="mt-3 border-t border-slate-800 pt-3">
+          <div className="flex items-center gap-2.5 px-1 py-1.5">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+              {iniciais(user?.displayName, user?.email)}
+            </span>
+            <div className="min-w-0">
+              <p className="truncate text-xs font-medium text-slate-200">
+                {user?.displayName ?? "Minha conta"}
+              </p>
+              <p className="truncate text-[11px] text-slate-500">{user?.email}</p>
+            </div>
+          </div>
+          <div className="mt-2 flex flex-col gap-1">
+            <Link
+              href="/configuracoes"
+              className={`flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
+                pathname === "/configuracoes"
+                  ? "bg-slate-800 text-slate-100"
+                  : "text-slate-400 hover:bg-slate-800/70 hover:text-slate-100"
+              }`}
+            >
+              <Icone nome="config" className="h-4 w-4" />
+              Configurações
+            </Link>
+            <Link
+              href="/assinatura"
+              className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:bg-slate-800/70 hover:text-slate-100"
+            >
+              <Icone nome="cartao" className="h-4 w-4" />
+              Minha assinatura
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-400 transition hover:bg-slate-800/70 hover:text-slate-100"
+            >
+              <Icone nome="sair" className="h-4 w-4" />
+              Sair
+            </button>
+          </div>
         </div>
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-slate-200 bg-white px-4 py-3 sm:hidden">
-          <Logo />
-          <div className="flex items-center gap-3">
-            <Link href="/configuracoes" className="text-xs font-medium text-slate-500">
-              Config.
-            </Link>
-            <Link href="/assinatura" className="text-xs font-medium text-slate-500">
-              Assinatura
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="text-xs font-medium text-slate-600"
-            >
-              Sair
-            </button>
-          </div>
+        <header className="flex items-center justify-between bg-slate-950 px-4 py-3 sm:hidden">
+          <Logo tone="light" />
+          <button
+            onClick={handleLogout}
+            aria-label="Sair"
+            className="rounded-lg p-1.5 text-slate-300 hover:bg-slate-800"
+          >
+            <Icone nome="sair" className="h-5 w-5" />
+          </button>
         </header>
 
         <main className="flex-1 p-4 sm:p-8">{children}</main>
 
-        <nav className="flex gap-4 overflow-x-auto border-t border-slate-200 bg-white px-4 py-2 sm:hidden">
+        <nav className="flex gap-1 overflow-x-auto border-t border-slate-200 bg-white px-2 py-1.5 sm:hidden">
           {NAV_ITEMS.map((item) => {
             const ativo = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`shrink-0 text-xs font-medium ${
-                  ativo ? "text-slate-900" : "text-slate-400"
+                className={`flex shrink-0 flex-col items-center gap-0.5 rounded-lg px-3 py-1.5 text-[10px] font-medium ${
+                  ativo ? "text-blue-600" : "text-slate-400"
                 }`}
               >
+                <Icone nome={item.icone} className="h-5 w-5" />
                 {item.label}
               </Link>
             );
