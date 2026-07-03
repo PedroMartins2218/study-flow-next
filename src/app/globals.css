@@ -3,6 +3,7 @@
 :root {
   --background: #f8fafc;
   --foreground: #171717;
+  --sf-ring-track: #e2e8f0;
 }
 
 @theme inline {
@@ -27,6 +28,7 @@ body {
 .dark {
   --background: #0f172a;
   --foreground: #e2e8f0;
+  --sf-ring-track: #1e293b;
 }
 .dark .bg-white {
   background-color: #1e293b;
@@ -68,4 +70,46 @@ body {
 .dark textarea {
   background-color: #0f172a;
   color: #e2e8f0;
+}
+/* Skeleton e indicadores no tema escuro */
+.dark .bg-slate-200 {
+  background-color: #334155;
+}
+.dark .hover\:bg-slate-200:hover {
+  background-color: #475569;
+}
+/* Anel dos cards (variante com opacidade) no tema escuro */
+.dark .ring-slate-200\/80 {
+  --tw-ring-color: #334155;
+}
+
+/* ══ Animações (Bloco A) ══
+   Entrada suave de listas/cards e dos toasts. Respeitam prefers-reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes sf-fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes sf-toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .animate-in {
+    animation: sf-fade-up 0.35s ease-out both;
+  }
+  .toast-in {
+    animation: sf-toast-in 0.25s ease-out both;
+  }
 }

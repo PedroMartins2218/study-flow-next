@@ -14,13 +14,19 @@ import { Botao } from "@/components/ui/Botao";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
+import { CardsSkeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { formatarDataCurta } from "@/lib/ui/datas";
 import type { Anotacao, Materia } from "@/types/studyflow";
 
 export default function CadernoPage() {
   const { user } = useAuth();
+  const toast = useToast();
+  const confirmar = useConfirm();
   const [anotacoes, setAnotacoes] = useState<Anotacao[]>([]);
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
   const [editando, setEditando] = useState<Anotacao | null>(null);
   const [erro, setErro] = useState("");
@@ -29,13 +35,29 @@ export default function CadernoPage() {
 
   useEffect(() => {
     if (!user) return;
-    const unsubA = subscribeToAnotacoes(user.uid, setAnotacoes);
+    const unsubA = subscribeToAnotacoes(user.uid, (lista) => {
+      setAnotacoes(lista);
+      setCarregando(false);
+    });
     const unsubM = subscribeToMaterias(user.uid, setMaterias);
     return () => {
       unsubA();
       unsubM();
     };
   }, [user]);
+
+  async function handleRemover(a: Anotacao) {
+    if (!user) return;
+    const ok = await confirmar({
+      titulo: `Remover “${a.titulo}”?`,
+      descricao: "Esta ação não pode ser desfeita.",
+      confirmar: "Remover",
+      perigo: true,
+    });
+    if (!ok) return;
+    await removerAnotacao(user.uid, a.id);
+    toast("Anotação removida");
+  }
 
   function abrirCriar() {
     setEditando(null);
@@ -63,8 +85,10 @@ export default function CadernoPage() {
     try {
       if (editando) {
         await atualizarAnotacao(user.uid, editando.id, dados);
+        toast("Anotação atualizada");
       } else {
         await criarAnotacao(user.uid, dados);
+        toast("Anotação salva");
       }
       setAberto(false);
     } catch (err) {
@@ -108,21 +132,23 @@ export default function CadernoPage() {
         </div>
       )}
 
-      {anotacoes.length === 0 ? (
+      {carregando ? (
+        <CardsSkeleton />
+      ) : anotacoes.length === 0 ? (
         <EmptyState
-          icone="caderno"
           titulo="Nenhuma anotação ainda"
           descricao="Guarde aqui os resumos e aprendizados de cada sessão de estudo."
           acao={<Botao onClick={abrirCriar}>Escrever a primeira</Botao>}
         />
       ) : visiveis.length === 0 ? (
         <EmptyState
+          ilustrado={false}
           icone="caderno"
           titulo="Nada nessa matéria"
           descricao="Nenhuma anotação com esse filtro. Tente outra matéria."
         />
       ) : (
-        <ul className="space-y-3">
+        <ul className="animate-in space-y-3">
           {visiveis.map((a) => (
             <li
               key={a.id}
@@ -149,7 +175,7 @@ export default function CadernoPage() {
                     </svg>
                   </button>
                   <button
-                    onClick={() => user && removerAnotacao(user.uid, a.id)}
+                    onClick={() => handleRemover(a)}
                     aria-label={`Remover ${a.titulo}`}
                     className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                   >

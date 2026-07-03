@@ -13,12 +13,18 @@ import { Botao } from "@/components/ui/Botao";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Icone } from "@/components/ui/Icone";
+import { CardsSkeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import type { Materia } from "@/types/studyflow";
 
 export default function MateriasPage() {
   const { user } = useAuth();
+  const toast = useToast();
+  const confirmar = useConfirm();
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
   const [editando, setEditando] = useState<Materia | null>(null);
   const [erro, setErro] = useState("");
@@ -26,7 +32,10 @@ export default function MateriasPage() {
 
   useEffect(() => {
     if (!user) return;
-    return subscribeToMaterias(user.uid, setMaterias);
+    return subscribeToMaterias(user.uid, (m) => {
+      setMaterias(m);
+      setCarregando(false);
+    });
   }, [user]);
 
   function abrirCriar() {
@@ -54,8 +63,10 @@ export default function MateriasPage() {
     try {
       if (editando) {
         await atualizarMateria(user.uid, editando.id, dados);
+        toast("Matéria atualizada");
       } else {
         await criarMateria(user.uid, dados);
+        toast("Matéria adicionada");
       }
       setAberto(false);
     } catch (err) {
@@ -63,6 +74,19 @@ export default function MateriasPage() {
     } finally {
       setEnviando(false);
     }
+  }
+
+  async function handleRemover(m: Materia) {
+    if (!user) return;
+    const ok = await confirmar({
+      titulo: `Remover “${m.nome}”?`,
+      descricao: "Isso apaga a matéria e não pode ser desfeito.",
+      confirmar: "Remover",
+      perigo: true,
+    });
+    if (!ok) return;
+    await removerMateria(user.uid, m.id);
+    toast("Matéria removida");
   }
 
   return (
@@ -77,19 +101,20 @@ export default function MateriasPage() {
         }
       />
 
-      {materias.length === 0 ? (
+      {carregando ? (
+        <CardsSkeleton />
+      ) : materias.length === 0 ? (
         <EmptyState
-          icone="livro"
           titulo="Nenhuma matéria ainda"
           descricao="Comece cadastrando a primeira matéria que você está estudando."
           acao={<Botao onClick={abrirCriar}>Adicionar matéria</Botao>}
         />
       ) : (
-        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <ul className="animate-in grid grid-cols-1 gap-3 sm:grid-cols-2">
           {materias.map((m) => (
             <li
               key={m.id}
-              className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition hover:shadow-md"
+              className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex items-start justify-between gap-3">
                 <span
@@ -106,7 +131,7 @@ export default function MateriasPage() {
                     <Icone nome="caderno" className="h-4 w-4" />
                   </button>
                   <button
-                    onClick={() => user && removerMateria(user.uid, m.id)}
+                    onClick={() => handleRemover(m)}
                     aria-label={`Remover ${m.nome}`}
                     className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
                   >

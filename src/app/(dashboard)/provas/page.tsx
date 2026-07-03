@@ -10,6 +10,9 @@ import { SlideOver } from "@/components/ui/SlideOver";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Icone } from "@/components/ui/Icone";
+import { CardsSkeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import { diasAte, formatarDataCurta, hojeISO } from "@/lib/ui/datas";
 import type { Materia, Prova } from "@/types/studyflow";
@@ -26,21 +29,40 @@ function BadgeProva({ data }: { data: string }) {
 
 export default function ProvasPage() {
   const { user } = useAuth();
+  const toast = useToast();
+  const confirmar = useConfirm();
   const [provas, setProvas] = useState<Prova[]>([]);
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    const unsubP = subscribeToProvas(user.uid, setProvas);
+    const unsubP = subscribeToProvas(user.uid, (lista) => {
+      setProvas(lista);
+      setCarregando(false);
+    });
     const unsubM = subscribeToMaterias(user.uid, setMaterias);
     return () => {
       unsubP();
       unsubM();
     };
   }, [user]);
+
+  async function handleRemover(prova: Prova) {
+    if (!user) return;
+    const ok = await confirmar({
+      titulo: `Remover “${prova.titulo}”?`,
+      descricao: "Esta ação não pode ser desfeita.",
+      confirmar: "Remover",
+      perigo: true,
+    });
+    if (!ok) return;
+    await removerProva(user.uid, prova.id);
+    toast("Prova removida");
+  }
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -55,6 +77,7 @@ export default function ProvasPage() {
         materia: String(form.get("materia") ?? ""),
         data: String(form.get("data") ?? ""),
       });
+      toast("Prova agendada");
       setAberto(false);
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Erro ao salvar prova.");
@@ -87,7 +110,7 @@ export default function ProvasPage() {
         </div>
         <BadgeProva data={prova.data} />
         <button
-          onClick={() => user && removerProva(user.uid, prova.id)}
+          onClick={() => handleRemover(prova)}
           aria-label={`Remover ${prova.titulo}`}
           className="rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
         >
@@ -111,16 +134,17 @@ export default function ProvasPage() {
         }
       />
 
-      {provas.length === 0 ? (
+      {carregando ? (
+        <CardsSkeleton />
+      ) : provas.length === 0 ? (
         <EmptyState
-          icone="calendario"
           titulo="Nenhuma prova agendada"
           descricao="Cadastre provas e simulados para acompanhar a contagem regressiva."
           acao={<Botao onClick={() => setAberto(true)}>Agendar prova</Botao>}
         />
       ) : (
         <>
-          <ul className="space-y-2">
+          <ul className="animate-in space-y-2">
             {futuras.map((p) => (
               <Cartao key={p.id} prova={p} />
             ))}

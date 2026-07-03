@@ -11,6 +11,9 @@ import { Botao } from "@/components/ui/Botao";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
+import { CardsSkeleton } from "@/components/ui/Skeleton";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import { formatarDataCurta, hojeISO } from "@/lib/ui/datas";
 import type { Materia } from "@/types/studyflow";
@@ -48,8 +51,11 @@ function BadgePrazo({ data, feita }: { data?: string; feita: boolean }) {
 
 export function TelaTarefas(config: Config) {
   const { user } = useAuth();
+  const toast = useToast();
+  const confirmar = useConfirm();
   const [itens, setItens] = useState<Tarefa[]>([]);
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -58,7 +64,10 @@ export function TelaTarefas(config: Config) {
 
   useEffect(() => {
     if (!user) return;
-    const unsubA = subscribe(user.uid, setItens);
+    const unsubA = subscribe(user.uid, (lista) => {
+      setItens(lista);
+      setCarregando(false);
+    });
     const unsubM = subscribeToMaterias(user.uid, setMaterias);
     return () => {
       unsubA();
@@ -78,12 +87,32 @@ export function TelaTarefas(config: Config) {
         materia: String(form.get("materia") ?? ""),
         data: String(form.get("data") ?? ""),
       });
+      toast("Adicionado");
       setAberto(false);
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Erro ao salvar.");
     } finally {
       setEnviando(false);
     }
+  }
+
+  async function handleAlternar(item: Tarefa) {
+    if (!user) return;
+    await alternar(user.uid, item.id, !item.feita);
+    if (!item.feita) toast("Boa! Concluída");
+  }
+
+  async function handleRemover(item: Tarefa) {
+    if (!user) return;
+    const ok = await confirmar({
+      titulo: `Remover “${item.titulo}”?`,
+      descricao: "Esta ação não pode ser desfeita.",
+      confirmar: "Remover",
+      perigo: true,
+    });
+    if (!ok) return;
+    await remover(user.uid, item.id);
+    toast("Removido");
   }
 
   const pendentes = itens.filter((i) => !i.feita);
@@ -94,7 +123,7 @@ export function TelaTarefas(config: Config) {
     return (
       <li className="group flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 transition hover:shadow-md">
         <button
-          onClick={() => user && alternar(user.uid, item.id, !item.feita)}
+          onClick={() => handleAlternar(item)}
           aria-label={item.feita ? "Marcar como pendente" : "Marcar como concluída"}
           className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
             item.feita
@@ -121,7 +150,7 @@ export function TelaTarefas(config: Config) {
         </div>
         <BadgePrazo data={item.data} feita={item.feita} />
         <button
-          onClick={() => user && remover(user.uid, item.id)}
+          onClick={() => handleRemover(item)}
           aria-label={`Remover ${item.titulo}`}
           className="rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
         >
@@ -145,16 +174,17 @@ export function TelaTarefas(config: Config) {
         }
       />
 
-      {itens.length === 0 ? (
+      {carregando ? (
+        <CardsSkeleton />
+      ) : itens.length === 0 ? (
         <EmptyState
-          icone={ent.icone}
           titulo={config.rotuloVazio}
           descricao={config.descricaoVazio}
           acao={<Botao onClick={() => setAberto(true)}>{config.rotuloNovo}</Botao>}
         />
       ) : (
         <>
-          <ul className="space-y-2">
+          <ul className="animate-in space-y-2">
             {pendentes.map((i) => (
               <Linha key={i.id} item={i} />
             ))}

@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { ToastProvider } from "@/components/ui/Toast";
+import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { assinaturaEstaAtiva, subscribeToAssinatura } from "@/lib/data/assinatura";
 import type { Assinatura } from "@/types/studyflow";
 
@@ -40,11 +42,17 @@ export default function DashboardLayout({
 
   if (loading || !user || assinatura === undefined || aguardandoAssinatura) {
     return (
-      <div className="flex flex-1 items-center justify-center text-sm text-slate-500">
-        Carregando...
+      <div className="flex flex-1 items-center justify-center">
+        <span className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
       </div>
     );
   }
 
-  return <DashboardShell>{children}</DashboardShell>;
+  return (
+    <ToastProvider>
+      <ConfirmProvider>
+        <DashboardShell>{children}</DashboardShell>
+      </ConfirmProvider>
+    </ToastProvider>
+  );
 }
