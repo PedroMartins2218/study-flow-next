@@ -1,46 +1,70 @@
 "use client";
 
+// Tela genérica de "tarefas com prazo" — usada por Atividades e Trabalhos,
+// que têm o mesmo formato (título, matéria, data opcional, concluído).
+
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { criarProva, removerProva, subscribeToProvas } from "@/lib/data/provas";
 import { subscribeToMaterias } from "@/lib/data/materias";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Botao } from "@/components/ui/Botao";
 import { SlideOver } from "@/components/ui/SlideOver";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
-import { Icone } from "@/components/ui/Icone";
 import { ENTIDADES } from "@/lib/ui/entidades";
-import { diasAte, formatarDataCurta, hojeISO } from "@/lib/ui/datas";
-import type { Materia, Prova } from "@/types/studyflow";
+import { formatarDataCurta, hojeISO } from "@/lib/ui/datas";
+import type { Materia } from "@/types/studyflow";
 
-const TIPOS = ["Prova", "Simulado"];
+export type Tarefa = {
+  id: string;
+  titulo: string;
+  materia: string;
+  data?: string;
+  feita: boolean;
+};
 
-function BadgeProva({ data }: { data: string }) {
-  const dias = diasAte(data);
-  if (dias < 0) return <Badge tom="neutro">Encerrada</Badge>;
-  if (dias === 0) return <Badge tom="perigo">É hoje!</Badge>;
-  if (dias <= 7) return <Badge tom="alerta">em {dias} {dias === 1 ? "dia" : "dias"}</Badge>;
-  return <Badge tom="info">em {dias} dias</Badge>;
+type Config = {
+  entidade: "atividades" | "trabalhos";
+  titulo: string;
+  subtitulo: string;
+  rotuloNovo: string;
+  rotuloVazio: string;
+  descricaoVazio: string;
+  placeholderTitulo: string;
+  subscribe: (uid: string, onChange: (itens: Tarefa[]) => void) => () => void;
+  criar: (uid: string, dados: { titulo: string; materia: string; data: string }) => Promise<void>;
+  alternar: (uid: string, id: string, feita: boolean) => Promise<void>;
+  remover: (uid: string, id: string) => Promise<void>;
+};
+
+function BadgePrazo({ data, feita }: { data?: string; feita: boolean }) {
+  if (feita) return <Badge tom="sucesso">Concluída</Badge>;
+  if (!data) return <Badge tom="neutro">Sem prazo</Badge>;
+  const hoje = hojeISO();
+  if (data < hoje) return <Badge tom="perigo">Atrasada</Badge>;
+  if (data === hoje) return <Badge tom="alerta">Hoje</Badge>;
+  return <Badge tom="neutro">{formatarDataCurta(data)}</Badge>;
 }
 
-export default function ProvasPage() {
+export function TelaTarefas(config: Config) {
   const { user } = useAuth();
-  const [provas, setProvas] = useState<Prova[]>([]);
+  const [itens, setItens] = useState<Tarefa[]>([]);
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [aberto, setAberto] = useState(false);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
 
+  const { subscribe, criar, alternar, remover } = config;
+
   useEffect(() => {
     if (!user) return;
-    const unsubP = subscribeToProvas(user.uid, setProvas);
+    const unsubA = subscribe(user.uid, setItens);
     const unsubM = subscribeToMaterias(user.uid, setMaterias);
     return () => {
-      unsubP();
+      unsubA();
       unsubM();
     };
-  }, [user]);
+  }, [user, subscribe]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -49,46 +73,56 @@ export default function ProvasPage() {
     setEnviando(true);
     const form = new FormData(e.currentTarget);
     try {
-      await criarProva(user.uid, {
+      await criar(user.uid, {
         titulo: String(form.get("titulo") ?? ""),
-        tipo: String(form.get("tipo") ?? ""),
         materia: String(form.get("materia") ?? ""),
         data: String(form.get("data") ?? ""),
       });
       setAberto(false);
     } catch (err) {
-      setErro(err instanceof Error ? err.message : "Erro ao salvar prova.");
+      setErro(err instanceof Error ? err.message : "Erro ao salvar.");
     } finally {
       setEnviando(false);
     }
   }
 
-  const hoje = hojeISO();
-  const futuras = provas
-    .filter((p) => p.data >= hoje)
-    .sort((a, b) => a.data.localeCompare(b.data));
-  const passadas = provas
-    .filter((p) => p.data < hoje)
-    .sort((a, b) => b.data.localeCompare(a.data));
+  const pendentes = itens.filter((i) => !i.feita);
+  const concluidas = itens.filter((i) => i.feita);
+  const ent = ENTIDADES[config.entidade];
 
-  function Cartao({ prova }: { prova: Prova }) {
+  function Linha({ item }: { item: Tarefa }) {
     return (
       <li className="group flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200/80 transition hover:shadow-md">
-        <span
-          className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${ENTIDADES.provas.chip}`}
+        <button
+          onClick={() => user && alternar(user.uid, item.id, !item.feita)}
+          aria-label={item.feita ? "Marcar como pendente" : "Marcar como concluída"}
+          className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${
+            item.feita
+              ? "border-emerald-500 bg-emerald-500 text-white"
+              : "border-slate-300 text-transparent hover:border-blue-500"
+          }`}
         >
-          <Icone nome="calendario" className="h-5 w-5" />
-        </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} className="h-3 w-3">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </button>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium text-slate-900">{prova.titulo}</p>
-          <p className="text-xs text-slate-500">
-            {prova.tipo} · {prova.materia} · {formatarDataCurta(prova.data)}
+          <p
+            className={`truncate text-sm font-medium ${
+              item.feita ? "text-slate-400 line-through" : "text-slate-900"
+            }`}
+          >
+            {item.titulo}
+          </p>
+          <p className="flex items-center gap-1.5 text-xs text-slate-500">
+            <span className={`h-1.5 w-1.5 rounded-full ${ent.ponto}`} />
+            {item.materia}
           </p>
         </div>
-        <BadgeProva data={prova.data} />
+        <BadgePrazo data={item.data} feita={item.feita} />
         <button
-          onClick={() => user && removerProva(user.uid, prova.id)}
-          aria-label={`Remover ${prova.titulo}`}
+          onClick={() => user && remover(user.uid, item.id)}
+          aria-label={`Remover ${item.titulo}`}
           className="rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-4 w-4">
@@ -102,42 +136,42 @@ export default function ProvasPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <PageHeader
-        titulo="Provas e simulados"
-        subtitulo="Datas que você precisa ter na cabeça."
+        titulo={config.titulo}
+        subtitulo={config.subtitulo}
         acao={
-          <Botao icone="calendario" onClick={() => { setErro(""); setAberto(true); }}>
-            Nova prova
+          <Botao icone={ent.icone} onClick={() => { setErro(""); setAberto(true); }}>
+            {config.rotuloNovo}
           </Botao>
         }
       />
 
-      {provas.length === 0 ? (
+      {itens.length === 0 ? (
         <EmptyState
-          icone="calendario"
-          titulo="Nenhuma prova agendada"
-          descricao="Cadastre provas e simulados para acompanhar a contagem regressiva."
-          acao={<Botao onClick={() => setAberto(true)}>Agendar prova</Botao>}
+          icone={ent.icone}
+          titulo={config.rotuloVazio}
+          descricao={config.descricaoVazio}
+          acao={<Botao onClick={() => setAberto(true)}>{config.rotuloNovo}</Botao>}
         />
       ) : (
         <>
           <ul className="space-y-2">
-            {futuras.map((p) => (
-              <Cartao key={p.id} prova={p} />
+            {pendentes.map((i) => (
+              <Linha key={i.id} item={i} />
             ))}
-            {futuras.length === 0 && (
+            {pendentes.length === 0 && (
               <li className="rounded-xl border border-dashed border-slate-300 p-5 text-center text-sm text-slate-400">
-                Nenhuma prova à vista. Respira!
+                Tudo concluído por aqui. 🎉
               </li>
             )}
           </ul>
-          {passadas.length > 0 && (
+          {concluidas.length > 0 && (
             <>
               <h2 className="mb-2 mt-8 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                Encerradas ({passadas.length})
+                Concluídas ({concluidas.length})
               </h2>
               <ul className="space-y-2">
-                {passadas.map((p) => (
-                  <Cartao key={p.id} prova={p} />
+                {concluidas.map((i) => (
+                  <Linha key={i.id} item={i} />
                 ))}
               </ul>
             </>
@@ -145,30 +179,16 @@ export default function ProvasPage() {
         </>
       )}
 
-      <SlideOver aberto={aberto} onFechar={() => setAberto(false)} titulo="Nova prova">
+      <SlideOver aberto={aberto} onFechar={() => setAberto(false)} titulo={config.rotuloNovo}>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-500">Título</label>
             <input
               name="titulo"
               required
-              placeholder="Ex.: Prova bimestral"
+              placeholder={config.placeholderTitulo}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
-          </div>
-          <div>
-            <label className="mb-1 block text-xs font-medium text-slate-500">Tipo</label>
-            <select
-              name="tipo"
-              required
-              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            >
-              {TIPOS.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
           </div>
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-500">Matéria</label>
@@ -191,11 +211,12 @@ export default function ProvasPage() {
             )}
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium text-slate-500">Data</label>
+            <label className="mb-1 block text-xs font-medium text-slate-500">
+              Prazo (opcional)
+            </label>
             <input
               name="data"
               type="date"
-              required
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -203,7 +224,7 @@ export default function ProvasPage() {
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
           )}
           <Botao type="submit" disabled={enviando || materias.length === 0}>
-            {enviando ? "Salvando..." : "Agendar prova"}
+            {enviando ? "Salvando..." : "Adicionar"}
           </Botao>
         </form>
       </SlideOver>

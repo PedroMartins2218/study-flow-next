@@ -9,141 +9,20 @@ import {
   subscribeToAnotacoes,
 } from "@/lib/data/anotacoes";
 import { subscribeToMaterias } from "@/lib/data/materias";
+import { PageHeader } from "@/components/ui/PageHeader";
+import { Botao } from "@/components/ui/Botao";
+import { SlideOver } from "@/components/ui/SlideOver";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Badge } from "@/components/ui/Badge";
+import { formatarDataCurta } from "@/lib/ui/datas";
 import type { Anotacao, Materia } from "@/types/studyflow";
-
-function formatarData(iso?: string) {
-  if (!iso) return "";
-  return new Date(iso).toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
-}
-
-function CartaoAnotacao({
-  anotacao,
-  materias,
-  onSalvar,
-  onRemover,
-}: {
-  anotacao: Anotacao;
-  materias: Materia[];
-  onSalvar: (dados: { titulo: string; materia: string; conteudo: string }) => Promise<void>;
-  onRemover: () => void;
-}) {
-  const [editando, setEditando] = useState(false);
-  const [erro, setErro] = useState("");
-  const [salvando, setSalvando] = useState(false);
-
-  async function handleSalvar(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setErro("");
-    setSalvando(true);
-    const form = new FormData(e.currentTarget);
-    try {
-      await onSalvar({
-        titulo: String(form.get("titulo") ?? ""),
-        materia: String(form.get("materia") ?? ""),
-        conteudo: String(form.get("conteudo") ?? ""),
-      });
-      setEditando(false);
-    } catch (err) {
-      setErro(err instanceof Error ? err.message : "Erro ao salvar anotação.");
-    } finally {
-      setSalvando(false);
-    }
-  }
-
-  if (editando) {
-    return (
-      <form
-        onSubmit={handleSalvar}
-        className="space-y-3 rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200"
-      >
-        <input
-          name="titulo"
-          required
-          defaultValue={anotacao.titulo}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-medium outline-none focus:border-slate-500"
-        />
-        <select
-          name="materia"
-          defaultValue={anotacao.materia ?? ""}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-        >
-          <option value="">Sem matéria</option>
-          {materias.map((m) => (
-            <option key={m.id} value={m.nome}>
-              {m.nome}
-            </option>
-          ))}
-        </select>
-        <textarea
-          name="conteudo"
-          required
-          rows={6}
-          defaultValue={anotacao.conteudo}
-          className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-        />
-        {erro && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
-        )}
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            disabled={salvando}
-            className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
-          >
-            {salvando ? "Salvando..." : "Salvar"}
-          </button>
-          <button
-            type="button"
-            onClick={() => setEditando(false)}
-            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            Cancelar
-          </button>
-        </div>
-      </form>
-    );
-  }
-
-  return (
-    <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="font-medium text-slate-900">{anotacao.titulo}</p>
-          <p className="text-xs text-slate-500">
-            {anotacao.materia ? `${anotacao.materia} · ` : ""}
-            {formatarData(anotacao.atualizadoEm ?? anotacao.criadoEm)}
-          </p>
-        </div>
-        <div className="flex shrink-0 gap-3">
-          <button
-            onClick={() => setEditando(true)}
-            className="text-xs font-medium text-slate-600 hover:underline"
-          >
-            Editar
-          </button>
-          <button
-            onClick={onRemover}
-            className="text-xs font-medium text-red-600 hover:underline"
-          >
-            Remover
-          </button>
-        </div>
-      </div>
-      <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
-        {anotacao.conteudo}
-      </p>
-    </div>
-  );
-}
 
 export default function CadernoPage() {
   const { user } = useAuth();
   const [anotacoes, setAnotacoes] = useState<Anotacao[]>([]);
   const [materias, setMaterias] = useState<Materia[]>([]);
+  const [aberto, setAberto] = useState(false);
+  const [editando, setEditando] = useState<Anotacao | null>(null);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [filtroMateria, setFiltroMateria] = useState("");
@@ -158,20 +37,36 @@ export default function CadernoPage() {
     };
   }, [user]);
 
+  function abrirCriar() {
+    setEditando(null);
+    setErro("");
+    setAberto(true);
+  }
+
+  function abrirEditar(a: Anotacao) {
+    setEditando(a);
+    setErro("");
+    setAberto(true);
+  }
+
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!user) return;
     setErro("");
     setEnviando(true);
-    const formEl = e.currentTarget;
-    const form = new FormData(formEl);
+    const form = new FormData(e.currentTarget);
+    const dados = {
+      titulo: String(form.get("titulo") ?? ""),
+      materia: String(form.get("materia") ?? ""),
+      conteudo: String(form.get("conteudo") ?? ""),
+    };
     try {
-      await criarAnotacao(user.uid, {
-        titulo: String(form.get("titulo") ?? ""),
-        materia: String(form.get("materia") ?? ""),
-        conteudo: String(form.get("conteudo") ?? ""),
-      });
-      formEl.reset();
+      if (editando) {
+        await atualizarAnotacao(user.uid, editando.id, dados);
+      } else {
+        await criarAnotacao(user.uid, dados);
+      }
+      setAberto(false);
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Erro ao salvar anotação.");
     } finally {
@@ -184,60 +79,24 @@ export default function CadernoPage() {
     : anotacoes;
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <h1 className="text-xl font-semibold text-slate-900">Caderno de estudos</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Suas anotações de estudo, organizadas por matéria.
-      </p>
-
-      <form
-        onSubmit={handleSubmit}
-        className="mt-6 flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200"
-      >
-        <input
-          name="titulo"
-          required
-          placeholder="Título da anotação"
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-        />
-        <select
-          name="materia"
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-        >
-          <option value="">Sem matéria</option>
-          {materias.map((m) => (
-            <option key={m.id} value={m.nome}>
-              {m.nome}
-            </option>
-          ))}
-        </select>
-        <textarea
-          name="conteudo"
-          required
-          rows={5}
-          placeholder="Escreva sua anotação..."
-          className="rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
-        />
-        <button
-          type="submit"
-          disabled={enviando}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700 disabled:opacity-60"
-        >
-          {enviando ? "Salvando..." : "Adicionar anotação"}
-        </button>
-      </form>
-
-      {erro && (
-        <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
-      )}
+    <div className="mx-auto max-w-3xl">
+      <PageHeader
+        titulo="Caderno de estudos"
+        subtitulo="Suas anotações de estudo, organizadas por matéria."
+        acao={
+          <Botao icone="caderno" onClick={abrirCriar}>
+            Nova anotação
+          </Botao>
+        }
+      />
 
       {anotacoes.length > 0 && (
-        <div className="mt-6 flex items-center gap-2">
+        <div className="mb-4 flex items-center gap-2">
           <label className="text-xs font-medium text-slate-500">Filtrar:</label>
           <select
             value={filtroMateria}
             onChange={(e) => setFiltroMateria(e.target.value)}
-            className="rounded-lg border border-slate-300 px-2 py-1 text-xs outline-none focus:border-slate-500"
+            className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs outline-none focus:border-blue-500"
           >
             <option value="">Todas as matérias</option>
             {materias.map((m) => (
@@ -249,24 +108,120 @@ export default function CadernoPage() {
         </div>
       )}
 
-      <div className="mt-4 space-y-3">
-        {visiveis.map((a) => (
-          <CartaoAnotacao
-            key={a.id}
-            anotacao={a}
-            materias={materias}
-            onSalvar={(dados) => atualizarAnotacao(user!.uid, a.id, dados)}
-            onRemover={() => user && removerAnotacao(user.uid, a.id)}
-          />
-        ))}
-        {visiveis.length === 0 && (
-          <div className="rounded-xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-400">
-            {anotacoes.length === 0
-              ? "Nenhuma anotação ainda. Escreva a primeira!"
-              : "Nenhuma anotação nessa matéria."}
+      {anotacoes.length === 0 ? (
+        <EmptyState
+          icone="caderno"
+          titulo="Nenhuma anotação ainda"
+          descricao="Guarde aqui os resumos e aprendizados de cada sessão de estudo."
+          acao={<Botao onClick={abrirCriar}>Escrever a primeira</Botao>}
+        />
+      ) : visiveis.length === 0 ? (
+        <EmptyState
+          icone="caderno"
+          titulo="Nada nessa matéria"
+          descricao="Nenhuma anotação com esse filtro. Tente outra matéria."
+        />
+      ) : (
+        <ul className="space-y-3">
+          {visiveis.map((a) => (
+            <li
+              key={a.id}
+              className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition hover:shadow-md"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="font-semibold text-slate-900">{a.titulo}</p>
+                  <div className="mt-1 flex items-center gap-2">
+                    {a.materia && <Badge tom="info">{a.materia}</Badge>}
+                    <span className="text-xs text-slate-400">
+                      {formatarDataCurta(a.atualizadoEm ?? a.criadoEm)}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
+                  <button
+                    onClick={() => abrirEditar(a)}
+                    aria-label={`Editar ${a.titulo}`}
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-4 w-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => user && removerAnotacao(user.uid, a.id)}
+                    aria-label={`Remover ${a.titulo}`}
+                    className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-600"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-4 w-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+                {a.conteudo}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <SlideOver
+        aberto={aberto}
+        onFechar={() => setAberto(false)}
+        titulo={editando ? "Editar anotação" : "Nova anotação"}
+      >
+        <form onSubmit={handleSubmit} className="flex h-full flex-col gap-4">
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-500">Título</label>
+            <input
+              name="titulo"
+              required
+              key={(editando?.id ?? "nova") + "-titulo"}
+              defaultValue={editando?.titulo ?? ""}
+              placeholder="Ex.: Resumo de funções"
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
           </div>
-        )}
-      </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium text-slate-500">
+              Matéria (opcional)
+            </label>
+            <select
+              name="materia"
+              key={(editando?.id ?? "nova") + "-materia"}
+              defaultValue={editando?.materia ?? ""}
+              className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            >
+              <option value="">Sem matéria</option>
+              {materias.map((m) => (
+                <option key={m.id} value={m.nome}>
+                  {m.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="flex flex-1 flex-col">
+            <label className="mb-1 block text-xs font-medium text-slate-500">Anotação</label>
+            <textarea
+              name="conteudo"
+              required
+              rows={10}
+              key={(editando?.id ?? "nova") + "-conteudo"}
+              defaultValue={editando?.conteudo ?? ""}
+              placeholder="Escreva sua anotação..."
+              className="w-full flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            />
+          </div>
+          {erro && (
+            <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
+          )}
+          <Botao type="submit" disabled={enviando}>
+            {enviando ? "Salvando..." : editando ? "Salvar alterações" : "Adicionar anotação"}
+          </Botao>
+        </form>
+      </SlideOver>
     </div>
   );
 }

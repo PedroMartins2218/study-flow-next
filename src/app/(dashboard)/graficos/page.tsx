@@ -13,6 +13,7 @@ import {
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { subscribeToMaterias } from "@/lib/data/materias";
 import { subscribeToSessoes } from "@/lib/data/sessoesFoco";
+import { PageHeader } from "@/components/ui/PageHeader";
 import type { Materia, SessaoFoco } from "@/types/studyflow";
 
 function ultimosSeteDias(): string[] {
@@ -71,10 +72,10 @@ export default function GraficosPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-xl font-semibold text-slate-900">Gráficos</h1>
-      <p className="mt-1 text-sm text-slate-500">
-        Sua evolução em números: foco, matérias e progresso.
-      </p>
+      <PageHeader
+        titulo="Gráficos"
+        subtitulo="Sua evolução em números: foco, matérias e progresso."
+      />
 
       <div className="mt-6 grid grid-cols-2 gap-4">
         <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
@@ -100,7 +101,7 @@ export default function GraficosPage() {
               <XAxis dataKey="dia" tick={{ fontSize: 12, fill: "#64748b" }} />
               <YAxis allowDecimals={false} tick={{ fontSize: 12, fill: "#64748b" }} width={32} />
               <Tooltip formatter={(v) => [`${v} min`, "Foco"]} />
-              <Bar dataKey="minutos" fill="#0f172a" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="minutos" fill="#2563eb" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -146,7 +147,7 @@ export default function GraficosPage() {
                 </div>
                 <div className="mt-1 h-2 w-full rounded-full bg-slate-100">
                   <div
-                    className="h-2 rounded-full bg-slate-900"
+                    className="h-2 rounded-full bg-blue-600"
                     style={{ width: `${m.prog}%` }}
                   />
                 </div>
