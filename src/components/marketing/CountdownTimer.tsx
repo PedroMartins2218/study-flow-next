@@ -1,9 +1,10 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { DATA_LANCAMENTO_MS } from "@/lib/launch";
 
-// Data prevista de lançamento: 06/07/2026, horário de Brasília (-03:00).
-const ALVO = new Date("2026-07-06T00:00:00-03:00").getTime();
+// Data prevista de lançamento (fonte única em lib/launch.ts).
+const ALVO = DATA_LANCAMENTO_MS;
 
 // Fonte externa (relógio): o snapshot só muda a cada tick do intervalo.
 let msRestante = ALVO - Date.now();

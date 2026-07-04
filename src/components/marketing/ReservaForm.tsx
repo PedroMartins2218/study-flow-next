@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import Link from "next/link";
+import { useEffect, useState, type FormEvent } from "react";
+import { jaLancou } from "@/lib/launch";
 
 const PLANOS = [
   "Fundador mensal (R$ 9,90/mês)",
@@ -11,6 +13,12 @@ export function ReservaForm() {
   const [enviando, setEnviando] = useState(false);
   const [sucesso, setSucesso] = useState(false);
   const [erro, setErro] = useState("");
+  // Só avalia no cliente (após montar) para não gerar mismatch de hidratação
+  // com a página estática.
+  const [encerrado, setEncerrado] = useState(false);
+  useEffect(() => {
+    queueMicrotask(() => setEncerrado(jaLancou()));
+  }, []);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,6 +47,26 @@ export function ReservaForm() {
     } finally {
       setEnviando(false);
     }
+  }
+
+  if (encerrado) {
+    return (
+      <div className="rounded-2xl bg-slate-50 p-6 text-center ring-1 ring-slate-200">
+        <p className="text-lg font-semibold text-slate-900">
+          As reservas de fundador encerraram
+        </p>
+        <p className="mt-2 text-sm text-slate-600">
+          O Study Flow já está no ar! Se você reservou, é só entrar e ativar seu
+          teste grátis.
+        </p>
+        <Link
+          href="/login"
+          className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+        >
+          Entrar
+        </Link>
+      </div>
+    );
   }
 
   if (sucesso) {

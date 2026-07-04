@@ -1,8 +1,17 @@
 import { NextResponse } from "next/server";
 import { reservaInputSchema } from "@/lib/validators/studyflow";
 import { registrarReserva } from "@/lib/data/reservasAdmin";
+import { jaLancou } from "@/lib/launch";
 
 export async function POST(request: Request) {
+  // Depois do lançamento, as reservas de fundador encerram.
+  if (jaLancou()) {
+    return NextResponse.json(
+      { erro: "As reservas de fundador foram encerradas — o Study Flow já está no ar." },
+      { status: 403 }
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
