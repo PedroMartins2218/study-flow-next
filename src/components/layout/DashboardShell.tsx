@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
+import { usePerfil } from "@/lib/perfil/PerfilProvider";
 import { Logo } from "@/components/marketing/Logo";
 import { Icone } from "@/components/ui/Icone";
 
@@ -27,6 +28,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { foto } = usePerfil();
 
   async function handleLogout() {
     await logout();
@@ -60,9 +62,18 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         </nav>
         <div className="mt-3 border-t border-slate-800 pt-3">
           <div className="flex items-center gap-2.5 px-1 py-1.5">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
-              {iniciais(user?.displayName, user?.email)}
-            </span>
+            {foto ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={foto}
+                alt=""
+                className="h-8 w-8 shrink-0 rounded-full object-cover"
+              />
+            ) : (
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
+                {iniciais(user?.displayName, user?.email)}
+              </span>
+            )}
             <div className="min-w-0">
               <p className="truncate text-xs font-medium text-slate-200">
                 {user?.displayName ?? "Minha conta"}

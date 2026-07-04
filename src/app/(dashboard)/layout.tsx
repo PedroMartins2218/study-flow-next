@@ -6,6 +6,8 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { DashboardShell } from "@/components/layout/DashboardShell";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
+import { PerfilProvider } from "@/lib/perfil/PerfilProvider";
+import { LembretesRunner } from "@/components/LembretesRunner";
 import { assinaturaEstaAtiva, subscribeToAssinatura } from "@/lib/data/assinatura";
 import type { Assinatura } from "@/types/studyflow";
 
@@ -51,7 +53,10 @@ export default function DashboardLayout({
   return (
     <ToastProvider>
       <ConfirmProvider>
-        <DashboardShell>{children}</DashboardShell>
+        <PerfilProvider>
+          <LembretesRunner />
+          <DashboardShell>{children}</DashboardShell>
+        </PerfilProvider>
       </ConfirmProvider>
     </ToastProvider>
   );

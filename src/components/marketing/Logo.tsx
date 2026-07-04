@@ -2,7 +2,7 @@ import Image from "next/image";
 import mark from "../../../public/logo-mark.png";
 
 type LogoProps = {
-  /** Mostra o texto "Study Flow" ao lado do traço "ST". */
+  /** Mostra o texto "Study Flow" ao lado do monograma. */
   withWordmark?: boolean;
   /** Esquema de cor do texto: azul da marca (padrão) ou claro para fundos escuros. */
   tone?: "brand" | "light";
@@ -10,8 +10,9 @@ type LogoProps = {
 };
 
 /**
- * Marca do Study Flow: traço "ST" (logo oficial em public/logo-mark.png) +
- * wordmark opcional. A logo completa (traço + "Study Flow") está em
+ * Marca do Study Flow: monograma oficial (public/logo-mark.png) + wordmark
+ * opcional. Em fundos escuros o monograma vai dentro de um chip branco para
+ * garantir contraste. A logo completa (monograma + "Study Flow") está em
  * public/logo.png para usos maiores.
  */
 export function Logo({ withWordmark = true, tone = "brand", className }: LogoProps) {
@@ -20,11 +21,11 @@ export function Logo({ withWordmark = true, tone = "brand", className }: LogoPro
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
       {isLight ? (
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white">
-          ST
+        <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-white">
+          <Image src={mark} alt="Study Flow" priority className="h-6 w-auto" />
         </span>
       ) : (
-        <Image src={mark} alt="" priority className="h-8 w-auto" />
+        <Image src={mark} alt="Study Flow" priority className="h-8 w-auto" />
       )}
       {withWordmark && (
         <span
