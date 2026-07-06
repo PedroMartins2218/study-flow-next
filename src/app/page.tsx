@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CountdownTimer } from "@/components/marketing/CountdownTimer";
 import { Logo } from "@/components/marketing/Logo";
+import { PreviewApp } from "@/components/marketing/PreviewApp";
 import { ReservaForm } from "@/components/marketing/ReservaForm";
 import { Testimonials } from "@/components/marketing/Testimonials";
 
@@ -155,6 +156,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Prévia do sistema */}
+      <PreviewApp />
 
       {/* Funções */}
       <section id="funcionalidades" className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">

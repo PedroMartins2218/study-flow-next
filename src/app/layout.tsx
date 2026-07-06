@@ -14,8 +14,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Study Flow",
+  metadataBase: new URL("https://study-flow-app-449.netlify.app"),
+  title: "Study Flow — organize seus estudos",
   description: "Organize seus estudos, acompanhe sua evolução e transforme foco em resultado.",
+  openGraph: {
+    title: "Study Flow — organize seus estudos",
+    description:
+      "Matérias, atividades, provas, caderno e modo foco num só painel. Acesso de fundador em pré-lançamento.",
+    url: "https://study-flow-app-449.netlify.app",
+    siteName: "Study Flow",
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Study Flow — organize seus estudos",
+    description: "Matérias, atividades, provas, caderno e modo foco num só painel.",
+  },
 };
 
 export default function RootLayout({
