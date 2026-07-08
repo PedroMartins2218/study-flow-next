@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { Logo } from "@/components/marketing/Logo";
@@ -11,6 +11,7 @@ function mensagemErro(erro: unknown): string {
   const codigo = (erro as { code?: string })?.code ?? "";
   switch (codigo) {
     case "auth/invalid-credential":
+    case "auth/invalid-login-credentials":
     case "auth/wrong-password":
     case "auth/user-not-found":
       return "E-mail ou senha incorretos.";
@@ -20,22 +21,32 @@ function mensagemErro(erro: unknown): string {
       return "Senha muito curta (mínimo 6 caracteres).";
     case "auth/invalid-email":
       return "E-mail inválido.";
+    case "auth/too-many-requests":
+      return "Muitas tentativas. Aguarde alguns minutos e tente de novo.";
+    case "auth/network-request-failed":
+      return "Sem conexão. Verifique sua internet e tente novamente.";
     default:
       return "Não foi possível concluir a operação. Tente novamente.";
   }
 }
 
 export default function LoginPage() {
-  const { user, loading, login, registrar, loginComGoogle, erroInicializacao } =
-    useAuth();
+  const { user, loading, login, registrar, erroInicializacao } = useAuth();
   const router = useRouter();
   const [aba, setAba] = useState<Aba>("login");
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const erroRef = useRef<HTMLParagraphElement>(null);
 
   useEffect(() => {
     if (!loading && user) router.replace("/dashboard");
   }, [loading, user, router]);
+
+  // Garante que a mensagem de erro fique visível (no celular, o teclado
+  // aberto pode deixá-la fora da tela).
+  useEffect(() => {
+    if (erro) erroRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [erro]);
 
   async function handleLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -68,15 +79,6 @@ export default function LoginPage() {
       setErro(mensagemErro(err));
     } finally {
       setEnviando(false);
-    }
-  }
-
-  async function handleGoogle() {
-    setErro("");
-    try {
-      await loginComGoogle();
-    } catch (err) {
-      setErro(mensagemErro(err));
     }
   }
 
@@ -116,7 +118,10 @@ export default function LoginPage() {
       )}
 
       {erro && (
-        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+        <p
+          ref={erroRef}
+          className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700"
+        >
           {erro}
         </p>
       )}
@@ -171,19 +176,6 @@ export default function LoginPage() {
         </form>
       )}
 
-      <div className="mt-4 flex items-center gap-2 text-xs text-slate-400">
-        <div className="h-px flex-1 bg-slate-200" />
-        ou
-        <div className="h-px flex-1 bg-slate-200" />
-      </div>
-
-      <button
-        type="button"
-        onClick={handleGoogle}
-        className="mt-4 w-full rounded-lg border border-slate-300 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-      >
-        Continuar com Google
-      </button>
     </div>
   );
 }

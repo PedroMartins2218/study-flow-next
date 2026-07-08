@@ -185,7 +185,7 @@ export default function CadernoPage() {
                   </button>
                 </div>
               </div>
-              <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-slate-600">
+              <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-relaxed text-slate-600">
                 {a.conteudo}
               </p>
             </li>

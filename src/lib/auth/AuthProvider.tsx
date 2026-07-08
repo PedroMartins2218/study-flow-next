@@ -11,9 +11,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
   signOut,
-  GoogleAuthProvider,
   type User,
 } from "firebase/auth";
 import { getFirebaseAuth } from "@/lib/firebase/client";
@@ -24,7 +22,6 @@ interface AuthContextValue {
   erroInicializacao: string | null;
   login: (email: string, senha: string) => Promise<void>;
   registrar: (email: string, senha: string) => Promise<void>;
-  loginComGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -62,9 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     registrar: async (email, senha) => {
       await createUserWithEmailAndPassword(getFirebaseAuth(), email, senha);
-    },
-    loginComGoogle: async () => {
-      await signInWithPopup(getFirebaseAuth(), new GoogleAuthProvider());
     },
     logout: async () => {
       await signOut(getFirebaseAuth());
