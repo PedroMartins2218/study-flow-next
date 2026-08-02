@@ -77,23 +77,40 @@ export default function AssinaturaPage() {
           )}
         </div>
       ) : nuncaTeve ? (
-        // Nunca teve assinatura → oferece o teste grátis (só quem reservou consegue)
+        // Nunca teve assinatura → quem reservou de fundador ganha 7 dias grátis;
+        // quem não reservou (a maioria, pós-lançamento) assina direto.
         <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
-          <p className="text-lg font-semibold text-slate-900">Comece seu teste grátis</p>
-          <p className="mt-2 text-sm text-slate-600">
-            Reservou seu acesso de fundador? Ative agora <strong>7 dias grátis</strong> —
-            sem cartão.
-          </p>
-          <button
-            onClick={ativarTrial}
-            disabled={ativandoTrial}
-            className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:opacity-60"
-          >
-            {ativandoTrial ? "Ativando..." : "Ativar meus 7 dias grátis"}
-          </button>
-          {erroTrial && (
-            <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erroTrial}</p>
+          <p className="text-lg font-semibold text-slate-900">Assine o Study Flow</p>
+          <p className="mt-2 text-sm text-slate-600">Acesso completo por R$ 19,90/mês.</p>
+          {CHECKOUT_URL ? (
+            <a
+              href={CHECKOUT_URL}
+              className="mt-4 inline-block rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700"
+            >
+              Assinar agora
+            </a>
+          ) : (
+            <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
+              Em breve: link de assinatura. Estamos finalizando o pagamento.
+            </p>
           )}
+
+          <div className="mt-6 border-t border-slate-100 pt-5">
+            <p className="text-xs text-slate-500">
+              Reservou seu acesso de fundador antes do lançamento? Ative seus{" "}
+              <strong>7 dias grátis</strong> em vez de assinar direto.
+            </p>
+            <button
+              onClick={ativarTrial}
+              disabled={ativandoTrial}
+              className="mt-3 inline-block rounded-lg border border-slate-300 px-5 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900 disabled:opacity-60"
+            >
+              {ativandoTrial ? "Ativando..." : "Ativar meus 7 dias grátis"}
+            </button>
+            {erroTrial && (
+              <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erroTrial}</p>
+            )}
+          </div>
         </div>
       ) : (
         // Já teve (trial expirado / inativo) → precisa assinar

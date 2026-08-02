@@ -5,8 +5,9 @@
 > arquivo atualizado e commitado junto.** Ao começar a trabalhar em qualquer
 > máquina: `git pull` e leia a seção "Últimas atualizações".
 >
-> **Última atualização:** 07/07/2026 — responsividade mobile completa, nav
-> estilo app, erros de login visíveis, remoção do login com Google.
+> **Última atualização:** 02/08/2026 — landing de vendas redesenhada (plano
+> único R$ 19,90/mês, sem countdown/reserva) e /assinatura corrigida pra quem
+> não reservou poder pagar direto.
 
 ---
 
@@ -79,15 +80,23 @@ firestore.rules            ← publicadas em produção (dados por usuário;
 - Polish: toasts, confirmação de exclusão, skeletons, animações, estados vazios
 - **Mobile:** responsivo de verdade — nav inferior fixa (Dashboard, Matérias,
   Atividades, Foco + "Mais" em bottom sheet), sem overflow em nenhuma tela
-- Landing com countdown, seção "Veja por dentro", OG image (preview no WhatsApp)
-- Captação: formulário de reserva → Firestore; painel /admin com CSV
+- Landing de vendas pós-lançamento (app/page.tsx): hero com print real do
+  dashboard, "para quem é", plano único R$19,90/mês, FAQ, OG image (preview no
+  WhatsApp). Sem countdown/reserva — CTAs levam pra /login
+- Captação (histórico, ainda ativa): formulário de reserva continua em
+  /api/reserva + painel /admin com CSV; só não aparece mais na landing
 - **Lançamento 08/07/2026 10:00** (lib/launch.ts): reservas travam sozinhas e o
   trial de 7 dias libera sozinho (exclusivo para e-mails na coleção `reservas`)
 - Notificações locais de provas/tarefas (1x/dia ao abrir o app, configurável)
 
 **Decisões importantes:**
-- Trial exclusivo para quem reservou; demais usuários caem no paywall
-- Kirvano será a ÚLTIMA integração (ninguém paga antes dos 7 dias de teste)
+- Trial de 7 dias exclusivo para quem reservou antes do lançamento; quem
+  assina agora (pós-lançamento) paga direto, R$19,90/mês, sem trial
+- Kirvano já integrada ao fluxo real: /assinatura manda quem não tem trial
+  direto pro checkout (`NEXT_PUBLIC_KIRVANO_CHECKOUT_URL`); falta confirmar
+  em produção o payload real do webhook com um pagamento de teste
+- Plano anual removido por enquanto — só mensal R$19,90; "Agente de IA
+  próprio" fica como bônus futuro do plano único, marcado "(em breve)"
 - Domínio próprio: adiado até o sistema dar resultado
 - Depoimentos fictícios: proibidos (seção "para quem é" usa cenários de uso)
 
@@ -100,34 +109,34 @@ firestore.rules            ← publicadas em produção (dados por usuário;
 - Env vars já configuradas no Netlify (Firebase client + Admin + ADMIN_SECRET;
   usar `netlify env:set --force -- CHAVE valor` — o env:import corrompe aspas)
 
-## Últimas atualizações (07/07/2026)
+## Últimas atualizações (02/08/2026)
 
-1. **Mobile responsivo:** corrigido overflow horizontal (faltava `min-w-0` no
-   flex; a nav antiga de 8 itens alargava a página). Nova nav inferior fixa
-   estilo app + menu "Mais" (sheet com Trabalhos, Provas, Caderno, Gráficos,
-   Config, Assinatura, Sair). Auditadas todas as telas em 375px: zero overflow.
-2. **Login:** erros sempre visíveis (mais códigos do Firebase mapeados +
-   scroll automático até a mensagem no celular). Removido "Continuar com
-   Google" (front + AuthProvider) — opção não existe no produto.
-3. `allowedDevOrigins` no next.config.ts para testar via celular na rede local
-   (o Next 16 bloqueia origens ≠ localhost no dev por padrão).
-4. Lançamento adiado de 06/07 para **08/07 10:00** (baixa adesão; reservas
-   reabertas automaticamente).
+1. **Landing de vendas redesenhada** (`src/app/page.tsx`): hero com print real
+   do dashboard (recortado, sem nome/e-mail visíveis), seção "O problema",
+   funcionalidades, "para quem é", plano único **R$19,90/mês** (removido o
+   anual), FAQ nova. Todos os CTAs levam pra `/login` — o checkout da Kirvano
+   só aparece depois de logar, pra casar o e-mail no webhook.
+2. **Removida a lógica de pré-lançamento da home:** countdown, formulário de
+   reserva e a prévia falsa em CSS saíram da landing. Componentes deletados
+   por ficarem sem uso: `CountdownTimer.tsx`, `ReservaForm.tsx`,
+   `PreviewApp.tsx`. O endpoint `/api/reserva` e o painel `/admin` continuam
+   ativos (histórico usado pela elegibilidade do trial).
+3. **Corrigido `/assinatura`:** quem nunca assinou e não reservou agora vê o
+   botão "Assinar agora" (checkout Kirvano) direto, em vez de só a oferta de
+   trial — que retornava erro sem alternativa pra quem não estava na lista de
+   reservas.
+4. `public/marketing/dashboard-preview.png` adicionado (print usado no hero).
 
 ## Próximos passos (ordem recomendada)
 
-1. **E-mail aos reservados no lançamento** (Resend, plano grátis): avisar que o
-   acesso abriu + link para criar conta e ativar o trial. Pedro precisa criar
-   conta no resend.com e gerar API key.
-2. **Pós-lançamento (08/07):** monitorar /admin e conversão dos 7 dias.
-3. **Kirvano (última integração):** página de vendas definitiva para publicar
-   na Kirvano; payload real do webhook (`extrairEmail`/`normalizarStatus` em
-   app/api/kirvano/webhook/route.ts); env `NEXT_PUBLIC_KIRVANO_CHECKOUT_URL` e
-   `KIRVANO_WEBHOOK_SECRET`; gravar plano estruturado (mensal/anual) p/ gating
-   futuro do Agente de IA (exclusivo anual, "em breve").
-4. **Tela de trial expirado → checkout** (depende da Kirvano).
-5. **Segurança final:** rate limit em /api/reserva, App Check, revisão de rules.
-6. **Stand-by:** domínio próprio; push notifications com app fechado (FCM).
+1. **Kirvano:** confirmar no Netlify que `NEXT_PUBLIC_KIRVANO_CHECKOUT_URL` e
+   `KIRVANO_WEBHOOK_SECRET` estão configurados; validar o payload real do
+   webhook (`extrairEmail`/`normalizarStatus` em
+   `app/api/kirvano/webhook/route.ts`) com um pagamento de teste de verdade.
+2. **Pós-lançamento:** monitorar `/admin` e conversão dos 7 dias de trial.
+3. **Segurança final:** rate limit em `/api/reserva`, App Check, revisão de
+   rules.
+4. **Stand-by:** domínio próprio; push notifications com app fechado (FCM).
 
 ## Fluxo de trabalho (setores)
 

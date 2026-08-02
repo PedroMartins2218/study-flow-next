@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Study Flow — organize seus estudos",
     description:
-      "Matérias, atividades, provas, caderno e modo foco num só painel. Acesso de fundador em pré-lançamento.",
+      "Matérias, atividades, provas, caderno e modo foco num só painel. Assine por R$ 19,90/mês.",
     url: "https://study-flow-app-449.netlify.app",
     siteName: "Study Flow",
     locale: "pt_BR",
