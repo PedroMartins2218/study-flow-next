@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useRef, useState, type FormEvent } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { Logo } from "@/components/marketing/Logo";
 
@@ -30,10 +30,16 @@ function mensagemErro(erro: unknown): string {
   }
 }
 
-export default function LoginPage() {
+function LoginConteudo() {
   const { user, loading, login, registrar, erroInicializacao } = useAuth();
   const router = useRouter();
-  const [aba, setAba] = useState<Aba>("login");
+  // Quem vem do checkout cai aqui via /obrigado com ?cadastro=1&email=...
+  // para não digitar de novo (e não errar) o e-mail da compra.
+  const searchParams = useSearchParams();
+  const emailInicial = searchParams.get("email") ?? "";
+  const [aba, setAba] = useState<Aba>(
+    searchParams.get("cadastro") === "1" ? "cadastro" : "login"
+  );
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
   const erroRef = useRef<HTMLParagraphElement>(null);
@@ -132,6 +138,7 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
+            defaultValue={emailInicial}
             placeholder="E-mail"
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
           />
@@ -156,6 +163,7 @@ export default function LoginPage() {
             name="email"
             type="email"
             required
+            defaultValue={emailInicial}
             placeholder="E-mail"
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-slate-500"
           />
@@ -177,5 +185,20 @@ export default function LoginPage() {
       )}
 
     </div>
+  );
+}
+
+// useSearchParams exige uma fronteira de Suspense acima no App Router.
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex justify-center rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+          <span className="h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-blue-600" />
+        </div>
+      }
+    >
+      <LoginConteudo />
+    </Suspense>
   );
 }

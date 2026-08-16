@@ -17,6 +17,7 @@ const NAV_ITEMS = [
   { href: "/caderno", label: "Caderno", icone: "caderno" },
   { href: "/graficos", label: "Gráficos", icone: "grafico" },
   { href: "/foco", label: "Foco", icone: "alvo" },
+  { href: "/ia", label: "Agente IA", icone: "ia" },
 ] as const;
 
 // No celular, a barra fixa mostra os 4 destinos mais usados + "Mais".

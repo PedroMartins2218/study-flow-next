@@ -8,10 +8,12 @@ import {
   removerAnotacao,
   subscribeToAnotacoes,
 } from "@/lib/data/anotacoes";
+import { removerTodosAnexos } from "@/lib/data/anexos";
 import { subscribeToMaterias } from "@/lib/data/materias";
+import { Anexos } from "@/components/caderno/Anexos";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Botao } from "@/components/ui/Botao";
-import { SlideOver } from "@/components/ui/SlideOver";
+import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { CardsSkeleton } from "@/components/ui/Skeleton";
@@ -55,6 +57,9 @@ export default function CadernoPage() {
       perigo: true,
     });
     if (!ok) return;
+    // O Firestore não apaga subcoleções em cascata: sem isto, as imagens
+    // anexadas ficariam órfãs ocupando espaço para sempre.
+    await removerTodosAnexos(user.uid, a.id);
     await removerAnotacao(user.uid, a.id);
     toast("Anotação removida");
   }
@@ -162,6 +167,14 @@ export default function CadernoPage() {
                     <span className="text-xs text-slate-400">
                       {formatarDataCurta(a.atualizadoEm ?? a.criadoEm)}
                     </span>
+                    {!!a.qtdAnexos && a.qtdAnexos > 0 && (
+                      <span className="flex items-center gap-1 text-xs text-slate-400">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} className="h-3.5 w-3.5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M18.375 12.739l-7.693 7.693a4.5 4.5 0 01-6.364-6.364l10.94-10.94A3 3 0 1119.5 7.372L8.552 18.32m.009-.01l-.01.01m5.699-9.941l-7.81 7.81a1.5 1.5 0 002.112 2.13" />
+                        </svg>
+                        {a.qtdAnexos}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-1 opacity-0 transition group-hover:opacity-100">
@@ -193,7 +206,7 @@ export default function CadernoPage() {
         </ul>
       )}
 
-      <SlideOver
+      <Modal
         aberto={aberto}
         onFechar={() => setAberto(false)}
         titulo={editando ? "Editar anotação" : "Nova anotação"}
@@ -240,6 +253,15 @@ export default function CadernoPage() {
               className="w-full flex-1 rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
+          {/* Anexar exige o id da anotação, que só existe depois de salvar. */}
+          {editando && user ? (
+            <Anexos uid={user.uid} anotacaoId={editando.id} />
+          ) : (
+            <p className="rounded-lg bg-slate-50 px-3 py-2.5 text-xs text-slate-500">
+              Salve a anotação para poder anexar fotos do caderno ou de resumos.
+            </p>
+          )}
+
           {erro && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
           )}
@@ -247,7 +269,7 @@ export default function CadernoPage() {
             {enviando ? "Salvando..." : editando ? "Salvar alterações" : "Adicionar anotação"}
           </Botao>
         </form>
-      </SlideOver>
+      </Modal>
     </div>
   );
 }

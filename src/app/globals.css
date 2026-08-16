@@ -83,6 +83,54 @@ body {
   --tw-ring-color: #334155;
 }
 
+/* ══ Impressão (resumos da IA → PDF) ══
+   Em vez de gerar PDF por biblioteca (~350 KB no navegador), montamos a página
+   e deixamos o usuário usar "Salvar como PDF" do próprio diálogo de impressão.
+   Só o bloco #impressao vai para o papel; o painel inteiro fica de fora. */
+#impressao {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #fff !important;
+  }
+  /* visibility (e não display) preserva o layout do container e evita
+     reflow estranho ao esconder a árvore inteira. */
+  body * {
+    visibility: hidden !important;
+  }
+  #impressao,
+  #impressao * {
+    visibility: visible !important;
+  }
+  #impressao {
+    display: block !important;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    color: #000;
+  }
+  #impressao h1 {
+    font-size: 20pt;
+  }
+  #impressao h2 {
+    font-size: 13pt;
+    margin-top: 16pt;
+    /* Não deixa um título sozinho no fim da página. */
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+  #impressao li,
+  #impressao p {
+    font-size: 11pt;
+    line-height: 1.5;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
 /* ══ Animações (Bloco A) ══
    Entrada suave de listas/cards e dos toasts. Respeitam prefers-reduced-motion. */
 @media (prefers-reduced-motion: no-preference) {

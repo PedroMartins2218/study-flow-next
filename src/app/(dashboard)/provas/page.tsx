@@ -2,11 +2,16 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
-import { criarProva, removerProva, subscribeToProvas } from "@/lib/data/provas";
+import {
+  atualizarProva,
+  criarProva,
+  removerProva,
+  subscribeToProvas,
+} from "@/lib/data/provas";
 import { subscribeToMaterias } from "@/lib/data/materias";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Botao } from "@/components/ui/Botao";
-import { SlideOver } from "@/components/ui/SlideOver";
+import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { Icone } from "@/components/ui/Icone";
@@ -35,8 +40,21 @@ export default function ProvasPage() {
   const [materias, setMaterias] = useState<Materia[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
+  const [editando, setEditando] = useState<Prova | null>(null);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+
+  function abrirCriar() {
+    setEditando(null);
+    setErro("");
+    setAberto(true);
+  }
+
+  function abrirEditar(prova: Prova) {
+    setEditando(prova);
+    setErro("");
+    setAberto(true);
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -70,14 +88,20 @@ export default function ProvasPage() {
     setErro("");
     setEnviando(true);
     const form = new FormData(e.currentTarget);
+    const dados = {
+      titulo: String(form.get("titulo") ?? ""),
+      tipo: String(form.get("tipo") ?? ""),
+      materia: String(form.get("materia") ?? ""),
+      data: String(form.get("data") ?? ""),
+    };
     try {
-      await criarProva(user.uid, {
-        titulo: String(form.get("titulo") ?? ""),
-        tipo: String(form.get("tipo") ?? ""),
-        materia: String(form.get("materia") ?? ""),
-        data: String(form.get("data") ?? ""),
-      });
-      toast("Prova agendada");
+      if (editando) {
+        await atualizarProva(user.uid, editando.id, dados);
+        toast("Alterações salvas");
+      } else {
+        await criarProva(user.uid, dados);
+        toast("Prova agendada");
+      }
       setAberto(false);
     } catch (err) {
       setErro(err instanceof Error ? err.message : "Erro ao salvar prova.");
@@ -110,6 +134,15 @@ export default function ProvasPage() {
         </div>
         <BadgeProva data={prova.data} />
         <button
+          onClick={() => abrirEditar(prova)}
+          aria-label={`Editar ${prova.titulo}`}
+          className="rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-slate-100 hover:text-slate-600 group-hover:opacity-100"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} className="h-4 w-4">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125" />
+          </svg>
+        </button>
+        <button
           onClick={() => handleRemover(prova)}
           aria-label={`Remover ${prova.titulo}`}
           className="rounded-lg p-1.5 text-slate-300 opacity-0 transition hover:bg-red-50 hover:text-red-600 group-hover:opacity-100"
@@ -128,7 +161,7 @@ export default function ProvasPage() {
         titulo="Provas e simulados"
         subtitulo="Datas que você precisa ter na cabeça."
         acao={
-          <Botao icone="calendario" onClick={() => { setErro(""); setAberto(true); }}>
+          <Botao icone="calendario" onClick={abrirCriar}>
             Nova prova
           </Botao>
         }
@@ -140,7 +173,7 @@ export default function ProvasPage() {
         <EmptyState
           titulo="Nenhuma prova agendada"
           descricao="Cadastre provas e simulados para acompanhar a contagem regressiva."
-          acao={<Botao onClick={() => setAberto(true)}>Agendar prova</Botao>}
+          acao={<Botao onClick={abrirCriar}>Agendar prova</Botao>}
         />
       ) : (
         <>
@@ -169,13 +202,21 @@ export default function ProvasPage() {
         </>
       )}
 
-      <SlideOver aberto={aberto} onFechar={() => setAberto(false)} titulo="Nova prova">
+      <Modal
+        aberto={aberto}
+        onFechar={() => setAberto(false)}
+        titulo={editando ? "Editar prova" : "Nova prova"}
+      >
+        {/* `key` em cada campo: sem isso o formulário mantém o valor da prova
+            anterior ao abrir a edição de outra. */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
             <label className="mb-1 block text-xs font-medium text-slate-500">Título</label>
             <input
               name="titulo"
               required
+              key={(editando?.id ?? "nova") + "-titulo"}
+              defaultValue={editando?.titulo ?? ""}
               placeholder="Ex.: Prova bimestral"
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
@@ -185,6 +226,8 @@ export default function ProvasPage() {
             <select
               name="tipo"
               required
+              key={(editando?.id ?? "nova") + "-tipo"}
+              defaultValue={editando?.tipo ?? TIPOS[0]}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               {TIPOS.map((t) => (
@@ -199,6 +242,8 @@ export default function ProvasPage() {
             <select
               name="materia"
               required
+              key={(editando?.id ?? "nova") + "-materia"}
+              defaultValue={editando?.materia ?? ""}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             >
               <option value="">Selecione a matéria</option>
@@ -220,6 +265,8 @@ export default function ProvasPage() {
               name="data"
               type="date"
               required
+              key={(editando?.id ?? "nova") + "-data"}
+              defaultValue={editando?.data ?? ""}
               className="w-full rounded-lg border border-slate-300 px-3 py-2.5 text-sm outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </div>
@@ -227,10 +274,10 @@ export default function ProvasPage() {
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{erro}</p>
           )}
           <Botao type="submit" disabled={enviando || materias.length === 0}>
-            {enviando ? "Salvando..." : "Agendar prova"}
+            {enviando ? "Salvando..." : editando ? "Salvar alterações" : "Agendar prova"}
           </Botao>
         </form>
-      </SlideOver>
+      </Modal>
     </div>
   );
 }

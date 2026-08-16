@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { usePerfil } from "@/lib/perfil/PerfilProvider";
 import { salvarFotoPerfil, removerFotoPerfil } from "@/lib/data/perfil";
 import { useToast } from "@/components/ui/Toast";
+import { comprimirImagem, IMAGEM_PERFIL } from "@/lib/ui/imagem";
 import {
   lerPrefs,
   salvarPrefs,
@@ -24,33 +25,6 @@ function iniciais(nome: string | null | undefined, email: string | null | undefi
   const base = (nome ?? email ?? "?").trim();
   const partes = base.split(/[\s@.]+/).filter(Boolean);
   return (partes[0]?.[0] ?? "?").toUpperCase() + (partes[1]?.[0]?.toUpperCase() ?? "");
-}
-
-// Reduz a imagem para um quadrado de 160px e devolve uma data URL JPEG leve.
-function processarFoto(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new window.Image();
-      img.onload = () => {
-        const size = 160;
-        const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return reject(new Error("canvas"));
-        const menor = Math.min(img.width, img.height);
-        const sx = (img.width - menor) / 2;
-        const sy = (img.height - menor) / 2;
-        ctx.drawImage(img, sx, sy, menor, menor, 0, 0, size, size);
-        resolve(canvas.toDataURL("image/jpeg", 0.82));
-      };
-      img.onerror = () => reject(new Error("imagem inválida"));
-      img.src = reader.result as string;
-    };
-    reader.onerror = () => reject(new Error("falha ao ler arquivo"));
-    reader.readAsDataURL(file);
-  });
 }
 
 export default function ConfiguracoesPage() {
@@ -107,7 +81,7 @@ export default function ConfiguracoesPage() {
     if (!file || !user) return;
     setEnviandoFoto(true);
     try {
-      const dataUrl = await processarFoto(file);
+      const dataUrl = await comprimirImagem(file, IMAGEM_PERFIL);
       await salvarFotoPerfil(user.uid, dataUrl);
       toast("Foto atualizada");
     } catch {

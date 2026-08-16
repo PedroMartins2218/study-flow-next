@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Logo } from "@/components/marketing/Logo";
 import { Testimonials } from "@/components/marketing/Testimonials";
+import { PLANOS } from "@/lib/planos";
 import dashboardPreview from "../../public/marketing/dashboard-preview.png";
 
 const DORES = [
@@ -93,19 +94,18 @@ const FUNCOES = [
   },
 ];
 
-const BENEFICIOS = [
-  "Matérias e progresso ilimitados",
-  "Atividades e trabalhos organizados por prazo",
-  "Provas e simulados com contagem regressiva",
-  "Caderno de estudos para suas anotações",
-  "Modo foco (Pomodoro) com histórico de sessões",
-  "Acesso pelo navegador, no computador ou celular",
-];
-
 const PERGUNTAS = [
   {
     q: "Preciso de cartão de crédito?",
     a: "O pagamento é feito com segurança direto no checkout da Kirvano, que aceita cartão e outras formas de pagamento disponíveis por lá. O Study Flow não coleta nem armazena dados de pagamento.",
+  },
+  {
+    q: "Qual a diferença entre o Base e o Pro?",
+    a: "O Base tem todas as ferramentas de organização: matérias, atividades, trabalhos, provas, caderno, modo foco e gráficos. O Pro inclui tudo isso e mais o Agente de IA, que lê um texto (plano de ensino, edital, recado do professor) e transforma em tarefas e provas já agendadas, para você só revisar e salvar.",
+  },
+  {
+    q: "Posso trocar de plano depois?",
+    a: "Sim. Você pode começar no Base e migrar para o Pro quando quiser o Agente de IA — e o contrário também vale.",
   },
   {
     q: "Posso cancelar quando quiser?",
@@ -139,8 +139,8 @@ export default function LandingPage() {
             >
               Entrar
             </Link>
-            <Link
-              href="/login"
+            <a
+              href="#planos"
               className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition hover:bg-blue-700"
             >
               Assinar agora
@@ -151,7 +151,7 @@ export default function LandingPage() {
                   clipRule="evenodd"
                 />
               </svg>
-            </Link>
+            </a>
           </div>
         </div>
       </header>
@@ -172,11 +172,11 @@ export default function LandingPage() {
             comece a estudar com constância hoje mesmo.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Link
-              href="/login"
+            <a
+              href="#planos"
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition hover:bg-blue-700"
             >
-              Assinar agora — R$ 19,90/mês
+              Assinar agora — a partir de R$ 29,90/mês
               <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
                 <path
                   fillRule="evenodd"
@@ -184,7 +184,7 @@ export default function LandingPage() {
                   clipRule="evenodd"
                 />
               </svg>
-            </Link>
+            </a>
             <a
               href="#funcionalidades"
               className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-slate-400 hover:text-slate-900"
@@ -298,72 +298,115 @@ export default function LandingPage() {
       {/* Para quem é */}
       <Testimonials />
 
-      {/* Plano */}
-      <section id="planos" className="mx-auto w-full max-w-4xl px-6 py-16 sm:py-24">
+      {/* Planos */}
+      <section id="planos" className="mx-auto w-full max-w-5xl px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-2xl text-center">
           <span className="text-sm font-semibold uppercase tracking-wide text-blue-600">
-            Plano
+            Planos
           </span>
           <h2 className="mt-3 text-2xl font-semibold tracking-tight text-slate-900 sm:text-3xl">
-            Um preço justo, acesso completo
+            Escolha como quer estudar
           </h2>
           <p className="mt-3 text-sm text-slate-500 sm:text-base">
-            Sem letra miúda, sem plano incompleto. Você assina e usa tudo.
+            Sem fidelidade e sem letra miúda. Cancele quando quiser.
           </p>
         </div>
 
-        <div className="mx-auto mt-12 max-w-md">
-          <div className="flex flex-col rounded-2xl bg-gradient-to-br from-blue-600 to-blue-700 p-8 text-center text-white shadow-xl shadow-blue-600/20 ring-1 ring-blue-600">
-            <span className="mx-auto inline-block rounded-full bg-white/15 px-3 py-1 text-xs font-semibold">
-              Acesso completo
-            </span>
-            <h3 className="mt-4 font-semibold">Study Flow mensal</h3>
-            <p className="mt-2 flex items-baseline justify-center gap-1.5">
-              <span className="text-4xl font-semibold">R$ 19,90</span>
-              <span className="text-base font-normal text-blue-100">/mês</span>
-            </p>
-            <p className="mt-2 text-sm text-blue-100">
-              Menos de R$ 0,70 por dia para organizar toda a sua rotina de
-              estudos.
-            </p>
-            <ul className="mt-6 space-y-3 text-left">
-              {BENEFICIOS.map((b) => (
-                <li key={b} className="flex items-start gap-2 text-sm text-blue-50">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    className="mt-0.5 h-4 w-4 shrink-0 text-white"
+        <div className="mx-auto mt-12 grid max-w-3xl grid-cols-1 gap-6 sm:grid-cols-2">
+          {PLANOS.map((plano) => {
+            const ehPro = plano.tier === "pro";
+            return (
+              <div
+                key={plano.tier}
+                className={`flex flex-col rounded-2xl p-7 shadow-sm ring-1 ${
+                  ehPro
+                    ? "bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-xl shadow-blue-600/20 ring-blue-600"
+                    : "bg-white text-slate-900 ring-slate-200"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="font-semibold">Study Flow {plano.nome}</h3>
+                  {plano.destaque && (
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        ehPro ? "bg-white/15 text-white" : "bg-blue-50 text-blue-700"
+                      }`}
+                    >
+                      {plano.destaque}
+                    </span>
+                  )}
+                </div>
+
+                <p className="mt-4 flex items-baseline gap-1.5">
+                  <span className="text-4xl font-semibold">{plano.preco}</span>
+                  <span
+                    className={`text-base font-normal ${ehPro ? "text-blue-100" : "text-slate-500"}`}
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                  </svg>
-                  {b}
-                </li>
-              ))}
-              <li className="flex items-start gap-2 text-sm font-semibold text-white">
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                  className="mt-0.5 h-4 w-4 shrink-0 text-white"
+                    /mês
+                  </span>
+                </p>
+                <p className={`mt-2 text-sm ${ehPro ? "text-blue-100" : "text-slate-600"}`}>
+                  {plano.resumo}
+                </p>
+
+                <ul className="mt-6 flex-1 space-y-3">
+                  {plano.beneficios.map((b) => (
+                    <li
+                      key={b}
+                      className={`flex items-start gap-2 text-sm ${
+                        ehPro ? "text-blue-50" : "text-slate-600"
+                      }`}
+                    >
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        className={`mt-0.5 h-4 w-4 shrink-0 ${
+                          ehPro ? "text-white" : "text-blue-600"
+                        }`}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
+                      </svg>
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+
+                {plano.checkoutUrl ? (
+                  <a
+                    href={plano.checkoutUrl}
+                    className={`mt-7 inline-flex items-center justify-center rounded-lg px-4 py-3 text-sm font-semibold transition ${
+                      ehPro
+                        ? "bg-white text-blue-700 hover:bg-blue-50"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                  >
+                    Assinar {plano.nome}
+                  </a>
+                ) : (
+                  <p
+                    className={`mt-7 rounded-lg px-3 py-2.5 text-center text-xs ${
+                      ehPro ? "bg-white/10 text-blue-50" : "bg-amber-50 text-amber-800"
+                    }`}
+                  >
+                    Link de assinatura em configuração.
+                  </p>
+                )}
+                <p
+                  className={`mt-3 text-center text-xs ${
+                    ehPro ? "text-blue-100/80" : "text-slate-400"
+                  }`}
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-                </svg>
-                Agente de IA próprio (em breve)
-              </li>
-            </ul>
-            <Link
-              href="/login"
-              className="mt-7 inline-flex items-center justify-center rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
-            >
-              Assinar agora
-            </Link>
-            <p className="mt-3 text-xs text-blue-100/80">
-              Cancele quando quiser, direto no seu painel. Sem fidelidade.
-            </p>
-          </div>
+                  {plano.porDia} · cancele quando quiser
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
@@ -404,14 +447,14 @@ export default function LandingPage() {
             Comece a organizar seus estudos hoje
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-blue-100 sm:text-base">
-            Estrutura, clareza e constância — por R$ 19,90/mês, você tem
-            acesso completo ao Study Flow agora mesmo.
+            Estrutura, clareza e constância — a partir de R$ 29,90/mês, você tem
+            acesso ao Study Flow agora mesmo.
           </p>
-          <Link
-            href="/login"
+          <a
+            href="#planos"
             className="mt-7 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-blue-700 transition hover:bg-blue-50"
           >
-            Assinar agora
+            Ver planos
             <svg viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
               <path
                 fillRule="evenodd"
@@ -419,7 +462,7 @@ export default function LandingPage() {
                 clipRule="evenodd"
               />
             </svg>
-          </Link>
+          </a>
         </div>
       </section>
 

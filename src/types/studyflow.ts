@@ -2,8 +2,17 @@ export interface Materia {
   id: string;
   nome: string;
   prog: number;
+  /** Capa opcional (data URL JPEG comprimida). Sem ela, a tela usa um gradiente. */
+  capa?: string;
   criadoEm?: string;
 }
+
+/**
+ * Etapa no quadro. O booleano `concluida`/`concluido` continua existindo e é
+ * mantido em sincronia (`feito` ⇔ true), porque o dashboard e os gráficos
+ * contam pendências por ele.
+ */
+export type SituacaoTarefa = "afazer" | "fazendo" | "feito";
 
 export interface Atividade {
   id: string;
@@ -11,6 +20,7 @@ export interface Atividade {
   materia: string;
   data?: string;
   concluida: boolean;
+  situacao: SituacaoTarefa;
   criadoEm?: string;
 }
 
@@ -20,6 +30,7 @@ export interface Trabalho {
   materia: string;
   data?: string;
   concluido: boolean;
+  situacao: SituacaoTarefa;
   criadoEm?: string;
 }
 
@@ -50,6 +61,8 @@ export interface Anotacao {
   titulo: string;
   materia?: string;
   conteudo: string;
+  /** Contador dos anexos da subcoleção, para a lista não precisar baixá-los. */
+  qtdAnexos?: number;
   criadoEm?: string;
   atualizadoEm?: string;
 }
@@ -63,10 +76,21 @@ export interface Reserva {
   criadoEm?: string;
 }
 
-export type StatusAssinatura = "ativo" | "inativo" | "expirado" | "trial";
+export type StatusAssinatura =
+  | "ativo"
+  | "trial"
+  | "inadimplente" // pagamento falhou; mantém acesso até a expiração (carência)
+  | "cancelado" // cancelou/reembolsou; acesso segue até o fim do ciclo pago
+  | "expirado"
+  | "inativo";
+
+// O que a pessoa comprou. Separado de `plano` (rótulo livre, ex.: "Study Flow
+// Pro") porque é isto — e só isto — que libera ou bloqueia o Agente de IA.
+export type TierAssinatura = "base" | "pro";
 
 export interface Assinatura {
   status: StatusAssinatura;
+  tier?: TierAssinatura;
   plano?: string;
   expiracao?: string;
 }

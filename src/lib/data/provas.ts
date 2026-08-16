@@ -7,6 +7,7 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  updateDoc,
   type Unsubscribe,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
@@ -42,6 +43,11 @@ export function subscribeToProvas(
 export async function criarProva(uid: string, input: ProvaInput) {
   const dados = provaInputSchema.parse(input);
   await addDoc(provasRef(uid), { ...dados, criadoEm: serverTimestamp() });
+}
+
+export async function atualizarProva(uid: string, id: string, input: ProvaInput) {
+  const dados = provaInputSchema.parse(input);
+  await updateDoc(doc(provasRef(uid), id), dados);
 }
 
 export async function removerProva(uid: string, id: string) {

@@ -27,6 +27,24 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+/**
+ * Puxa para a conta uma compra que a Kirvano já aprovou antes de o usuário se
+ * cadastrar (fluxo "pagar primeiro, criar conta depois"). Falha em silêncio de
+ * propósito: não pode impedir o login, e a tela /assinatura tem o botão
+ * "Já paguei" como plano B.
+ */
+async function sincronizarAssinatura(usuario: User) {
+  try {
+    const token = await usuario.getIdToken();
+    await fetch("/api/assinatura/sincronizar", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+    });
+  } catch (erro) {
+    console.error("Falha ao sincronizar assinatura:", erro);
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -55,10 +73,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loading,
     erroInicializacao,
     login: async (email, senha) => {
-      await signInWithEmailAndPassword(getFirebaseAuth(), email, senha);
+      const credencial = await signInWithEmailAndPassword(getFirebaseAuth(), email, senha);
+      await sincronizarAssinatura(credencial.user);
     },
     registrar: async (email, senha) => {
-      await createUserWithEmailAndPassword(getFirebaseAuth(), email, senha);
+      const credencial = await createUserWithEmailAndPassword(getFirebaseAuth(), email, senha);
+      await sincronizarAssinatura(credencial.user);
     },
     logout: async () => {
       await signOut(getFirebaseAuth());

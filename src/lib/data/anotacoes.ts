@@ -35,6 +35,7 @@ export function subscribeToAnotacoes(
           titulo: data.titulo,
           materia: data.materia || undefined,
           conteudo: data.conteudo,
+          qtdAnexos: Number(data.qtdAnexos ?? 0),
           criadoEm: data.criadoEm?.toDate?.().toISOString(),
           atualizadoEm: data.atualizadoEm?.toDate?.().toISOString(),
         } satisfies Anotacao;

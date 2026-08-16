@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   deleteDoc,
+  deleteField,
   doc,
   onSnapshot,
   orderBy,
@@ -31,6 +32,7 @@ export function subscribeToMaterias(
           id: d.id,
           nome: data.nome,
           prog: data.prog,
+          capa: data.capa || undefined,
           criadoEm: data.criadoEm?.toDate?.().toISOString(),
         } satisfies Materia;
       })
@@ -50,6 +52,16 @@ export async function atualizarMateria(
 ) {
   const dados = materiaInputSchema.partial().parse(input);
   await updateDoc(doc(materiasRef(uid), id), dados);
+}
+
+/**
+ * Grava (ou apaga) a capa da matéria. Fica fora de `atualizarMateria` porque a
+ * capa não passa pelo schema do formulário — é uma data URL longa.
+ */
+export async function definirCapaMateria(uid: string, id: string, capa: string | null) {
+  await updateDoc(doc(materiasRef(uid), id), {
+    capa: capa ?? deleteField(),
+  });
 }
 
 export async function removerMateria(uid: string, id: string) {

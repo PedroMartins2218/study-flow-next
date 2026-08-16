@@ -2,8 +2,9 @@
 
 import { useCallback } from "react";
 import {
-  alternarAtividade,
+  atualizarAtividade,
   criarAtividade,
+  moverAtividade,
   removerAtividade,
   subscribeToAtividades,
 } from "@/lib/data/atividades";
@@ -19,7 +20,7 @@ export default function AtividadesPage() {
             titulo: a.titulo,
             materia: a.materia,
             data: a.data,
-            feita: a.concluida,
+            situacao: a.situacao,
           }))
         )
       ),
@@ -30,14 +31,16 @@ export default function AtividadesPage() {
     <TelaTarefas
       entidade="atividades"
       titulo="Atividades de estudo"
-      subtitulo="O que precisa ser feito hoje e nos próximos dias."
+      subtitulo="Arraste entre as etapas para acompanhar o que está em andamento."
       rotuloNovo="Nova atividade"
       rotuloVazio="Nenhuma atividade ainda"
       descricaoVazio="Adicione o que você precisa estudar e acompanhe pelo prazo."
       placeholderTitulo="Ex.: Resolver lista de exercícios"
+      rotuloFeito="Concluído"
       subscribe={subscribe}
       criar={criarAtividade}
-      alternar={alternarAtividade}
+      atualizar={atualizarAtividade}
+      mover={moverAtividade}
       remover={removerAtividade}
     />
   );

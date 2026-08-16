@@ -3,6 +3,7 @@ import "server-only";
 import { getAdminFirestore } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { DIAS_TRIAL, jaLancou } from "@/lib/launch";
+import { hojeISO, somarDias } from "@/lib/data/assinaturaCore";
 
 export type ResultadoTrial =
   | { ok: true }
@@ -45,10 +46,9 @@ export async function ativarTrialSeElegivel(
     };
   }
 
-  // Concede 7 dias de trial.
-  const exp = new Date();
-  exp.setDate(exp.getDate() + DIAS_TRIAL);
-  const expiracao = exp.toISOString().split("T")[0];
+  // Concede 7 dias de trial, contados pelo calendário de Brasília (com UTC,
+  // quem ativasse à noite perderia um dia).
+  const expiracao = somarDias(hojeISO(), DIAS_TRIAL);
 
   await db.collection("assinaturas").doc(uid).set({
     status: "trial",

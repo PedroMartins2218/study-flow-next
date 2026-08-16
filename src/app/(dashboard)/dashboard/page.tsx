@@ -11,6 +11,8 @@ import { subscribeToSessoes } from "@/lib/data/sessoesFoco";
 import { Icone } from "@/components/ui/Icone";
 import { Badge } from "@/components/ui/Badge";
 import { ENTIDADES } from "@/lib/ui/entidades";
+import { dataLocalISO, hojeISO } from "@/lib/ui/datas";
+import { calcularStreak, formatarMinutos } from "@/lib/ui/estatisticas";
 import type {
   Atividade,
   Materia,
@@ -30,21 +32,6 @@ function saudacao() {
   if (h < 12) return "Bom dia";
   if (h < 18) return "Boa tarde";
   return "Boa noite";
-}
-
-// Sequência de dias seguidos com pelo menos uma sessão de foco (contando a
-// partir de hoje ou, se hoje ainda não teve, de ontem).
-function calcularStreak(sessoes: SessaoFoco[]): number {
-  const dias = new Set(sessoes.map((s) => s.data));
-  const iso = (d: Date) => d.toISOString().split("T")[0];
-  const cursor = new Date();
-  if (!dias.has(iso(cursor))) cursor.setDate(cursor.getDate() - 1);
-  let streak = 0;
-  while (dias.has(iso(cursor))) {
-    streak++;
-    cursor.setDate(cursor.getDate() - 1);
-  }
-  return streak;
 }
 
 function CardMetrica({
@@ -102,7 +89,7 @@ export default function DashboardPage() {
     return () => unsubs.forEach((u) => u());
   }, [user]);
 
-  const hoje = new Date().toISOString().split("T")[0];
+  const hoje = hojeISO();
   const agora = new Date();
 
   const atividadesPendentes = atividades.filter((a) => !a.concluida);
@@ -135,7 +122,7 @@ export default function DashboardPage() {
     for (let i = 6; i >= 0; i--) {
       const d = new Date();
       d.setDate(d.getDate() - i);
-      const chave = d.toISOString().split("T")[0];
+      const chave = dataLocalISO(d);
       dias.push({ chave, mins: mapa.get(chave) ?? 0 });
     }
     return dias;
@@ -241,7 +228,13 @@ export default function DashboardPage() {
         <CardMetrica entidade="materias" valor={materias.length} titulo="Matérias" href="/materias" />
         <CardMetrica entidade="atividades" valor={atividadesPendentes.length} titulo="Atividades" href="/atividades" />
         <CardMetrica entidade="trabalhos" valor={trabalhosPendentes.length} titulo="Trabalhos" href="/trabalhos" />
-        <CardMetrica entidade="foco" valor={focoHoje} sufixo="min" titulo="Foco hoje" href="/foco" />
+        <CardMetrica
+          entidade="foco"
+          valor={focoHoje === 0 ? "0" : formatarMinutos(focoHoje)}
+          sufixo={focoHoje === 0 ? "min" : undefined}
+          titulo="Foco hoje"
+          href="/foco"
+        />
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1.35fr_1fr]">

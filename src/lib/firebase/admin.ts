@@ -19,8 +19,15 @@ function limparEnv(bruto: string | undefined): string | undefined {
 
 function normalizarPrivateKey(bruto: string | undefined): string | undefined {
   const limpa = limparEnv(bruto);
-  // Converte "\n" literal em quebras de linha reais (no-op se já forem reais).
-  return limpa?.replace(/\\n/g, "\n");
+  if (!limpa) return limpa;
+  // Converte quebras de linha escritas como texto em quebras reais.
+  // São dois casos, nesta ordem:
+  //  1. "\\n" — a chave passou por uma etapa a mais de escape (acontece ao
+  //     colar via terminal/painel de deploy). Sem tratar, sobra uma barra
+  //     solta no PEM e o SDK falha com "Failed to parse private key";
+  //  2. "\n"  — o formato normal do JSON de service account.
+  // Se as quebras já forem reais, os dois passos são no-op.
+  return limpa.replace(/\\\\n/g, "\n").replace(/\\n/g, "\n");
 }
 
 /**

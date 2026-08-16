@@ -17,7 +17,11 @@ service cloud.firestore {
     match /usuarios/{docId} {
       allow read, write: if isOwnerDoc(docId);
 
-      match /{colecao}/{itemId} {
+      // Qualquer profundidade abaixo do usuário: materias, atividades,
+      // trabalhos, provas, sessoes, anotacoes — e as subcoleções destas, como
+      // anotacoes/{id}/anexos. A regra anterior casava só UM nível e deixaria
+      // os anexos do caderno inacessíveis.
+      match /{documento=**} {
         allow read, write: if isOwnerDoc(docId);
       }
     }
@@ -28,6 +32,24 @@ service cloud.firestore {
     match /assinaturas/{docId} {
       allow read: if isOwnerDoc(docId);
       allow write: if false;
+    }
+
+    // Cota do Agente de IA: o cliente pode conferir o próprio consumo, mas
+    // jamais escrever — o contador é o que segura o custo da API.
+    match /usoIa/{docId} {
+      allow read: if isOwnerDoc(docId);
+      allow write: if false;
+    }
+
+    // Ledger de pagamentos e compras aguardando cadastro: nada disso é da
+    // conta do cliente. Só o Admin SDK acessa.
+    // (O catch-all abaixo já negaria; explicitamos para deixar a intenção clara.)
+    match /pagamentos/{docId} {
+      allow read, write: if false;
+    }
+
+    match /assinaturasPendentes/{docId} {
+      allow read, write: if false;
     }
 
     // Nega qualquer outro acesso por padrão — isto é o que fecha o

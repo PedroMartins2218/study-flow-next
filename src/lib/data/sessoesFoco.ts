@@ -12,6 +12,7 @@ import {
   sessaoFocoInputSchema,
   type SessaoFocoInput,
 } from "@/lib/validators/studyflow";
+import { dataLocalISO } from "@/lib/ui/datas";
 import type { SessaoFoco } from "@/types/studyflow";
 
 function sessoesRef(uid: string) {
@@ -44,7 +45,9 @@ export async function registrarSessao(uid: string, input: SessaoFocoInput) {
   const agora = new Date();
   await addDoc(sessoesRef(uid), {
     ...dados,
-    data: agora.toISOString().split("T")[0],
+    // Data no calendário de Brasília: com UTC, uma sessão às 21h entraria como
+    // sendo do dia seguinte e sumiria do "foco hoje".
+    data: dataLocalISO(agora),
     hora: agora.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }),
     criadoEm: serverTimestamp(),
   });

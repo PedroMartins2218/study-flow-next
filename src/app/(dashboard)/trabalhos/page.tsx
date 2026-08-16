@@ -2,8 +2,9 @@
 
 import { useCallback } from "react";
 import {
-  alternarTrabalho,
+  atualizarTrabalho,
   criarTrabalho,
+  moverTrabalho,
   removerTrabalho,
   subscribeToTrabalhos,
 } from "@/lib/data/trabalhos";
@@ -19,7 +20,7 @@ export default function TrabalhosPage() {
             titulo: t.titulo,
             materia: t.materia,
             data: t.data,
-            feita: t.concluido,
+            situacao: t.situacao,
           }))
         )
       ),
@@ -30,14 +31,16 @@ export default function TrabalhosPage() {
     <TelaTarefas
       entidade="trabalhos"
       titulo="Trabalhos"
-      subtitulo="Entregas e trabalhos escolares, organizados por prazo."
+      subtitulo="Arraste entre as etapas até a entrega."
       rotuloNovo="Novo trabalho"
       rotuloVazio="Nenhum trabalho ainda"
       descricaoVazio="Cadastre os trabalhos e entregas para não perder nenhum prazo."
       placeholderTitulo="Ex.: Trabalho de biologia"
+      rotuloFeito="Entregue"
       subscribe={subscribe}
       criar={criarTrabalho}
-      alternar={alternarTrabalho}
+      atualizar={atualizarTrabalho}
+      mover={moverTrabalho}
       remover={removerTrabalho}
     />
   );

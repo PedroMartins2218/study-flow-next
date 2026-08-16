@@ -9,7 +9,11 @@ const nextConfig: NextConfig = {
   // Só afeta `next dev`: permite testar pelo celular na rede local (o Next
   // bloqueia origens diferentes de localhost por padrão no modo dev, o que
   // deixava a página sem JavaScript — botão de login "morto").
-  allowedDevOrigins: ["192.168.0.68"],
+  //
+  // O IP da máquina muda quando o roteador renova o DHCP, então a lista guarda
+  // os já usados. Se o celular abrir a página mas nada funcionar, é sinal de que
+  // o IP mudou de novo: confira com `ipconfig` e acrescente aqui.
+  allowedDevOrigins: ["192.168.0.88", "192.168.0.68", "192.168.0.7"],
 };
 
 export default nextConfig;

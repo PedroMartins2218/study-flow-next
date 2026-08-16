@@ -2,13 +2,10 @@ import { doc, onSnapshot, type Unsubscribe } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
 import type { Assinatura } from "@/types/studyflow";
 
-export function assinaturaEstaAtiva(assinatura: Assinatura | null): boolean {
-  if (!assinatura) return false;
-  if (assinatura.status !== "ativo" && assinatura.status !== "trial") return false;
-  if (!assinatura.expiracao) return true;
-  const hoje = new Date().toISOString().split("T")[0];
-  return assinatura.expiracao >= hoje;
-}
+// As regras de acesso vivem em assinaturaCore.ts (sem Firebase) para o servidor
+// poder aplicar as mesmas. Reexportadas aqui para o cliente não precisar saber
+// dessa divisão.
+export { assinaturaEstaAtiva, temAcessoIa } from "@/lib/data/assinaturaCore";
 
 export function subscribeToAssinatura(
   uid: string,
@@ -25,6 +22,7 @@ export function subscribeToAssinatura(
       const data = snap.data();
       onChange({
         status: data.status,
+        tier: data.tier,
         plano: data.plano,
         expiracao: data.expiracao,
       });

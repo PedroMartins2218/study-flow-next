@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import {
   atualizarMateria,
   criarMateria,
+  definirCapaMateria,
   removerMateria,
   subscribeToMaterias,
 } from "@/lib/data/materias";
+import { comprimirImagem, IMAGEM_CAPA } from "@/lib/ui/imagem";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { Botao } from "@/components/ui/Botao";
-import { SlideOver } from "@/components/ui/SlideOver";
+import { Modal } from "@/components/ui/Modal";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Icone } from "@/components/ui/Icone";
 import { CardsSkeleton } from "@/components/ui/Skeleton";
@@ -19,16 +21,40 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import type { Materia } from "@/types/studyflow";
 
+const PASSO_PROGRESSO = 5;
+
+// Gradiente estável derivado do nome: sem capa, a lista já nasce colorida e
+// cada matéria mantém sempre a mesma cor, sem custo de armazenamento.
+const GRADIENTES = [
+  "from-blue-500 to-sky-400",
+  "from-violet-500 to-purple-400",
+  "from-emerald-500 to-teal-400",
+  "from-amber-500 to-orange-400",
+  "from-rose-500 to-pink-400",
+  "from-cyan-500 to-blue-400",
+];
+
+function gradienteDoNome(nome: string): string {
+  let soma = 0;
+  for (let i = 0; i < nome.length; i++) soma += nome.charCodeAt(i);
+  return GRADIENTES[soma % GRADIENTES.length];
+}
+
 export default function MateriasPage() {
   const { user } = useAuth();
   const toast = useToast();
   const confirmar = useConfirm();
   const [materias, setMaterias] = useState<Materia[]>([]);
+  // Progresso mostrado na tela enquanto a gravação não sai. Sem isso, a barra
+  // só andaria quando o Firestore respondesse, e os cliques pareceriam perdidos.
+  const [progressoLocal, setProgressoLocal] = useState<Record<string, number>>({});
+  const timers = useRef<Record<string, ReturnType<typeof setTimeout>>>({});
   const [carregando, setCarregando] = useState(true);
   const [aberto, setAberto] = useState(false);
   const [editando, setEditando] = useState<Materia | null>(null);
   const [erro, setErro] = useState("");
   const [enviando, setEnviando] = useState(false);
+  const [enviandoCapa, setEnviandoCapa] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -37,6 +63,44 @@ export default function MateriasPage() {
       setCarregando(false);
     });
   }, [user]);
+
+  // Limpa os timers pendentes se a tela for desmontada no meio de uma rajada.
+  useEffect(() => {
+    const pendentes = timers.current;
+    return () => Object.values(pendentes).forEach(clearTimeout);
+  }, []);
+
+  /**
+   * Ajusta o progresso pelos botões + / −.
+   * A barra anda na hora e a gravação é adiada: dez cliques seguidos viram
+   * uma escrita só no Firestore, em vez de dez.
+   */
+  const ajustarProgresso = useCallback(
+    (materia: Materia, delta: number) => {
+      if (!user) return;
+      const atual = progressoLocal[materia.id] ?? materia.prog;
+      const novo = Math.min(100, Math.max(0, atual + delta));
+      if (novo === atual) return;
+
+      setProgressoLocal((p) => ({ ...p, [materia.id]: novo }));
+
+      clearTimeout(timers.current[materia.id]);
+      timers.current[materia.id] = setTimeout(async () => {
+        try {
+          await atualizarMateria(user.uid, materia.id, { nome: materia.nome, prog: novo });
+        } catch {
+          // Falhou: devolve o valor do servidor para a tela não mentir.
+          setProgressoLocal((p) => {
+            const copia = { ...p };
+            delete copia[materia.id];
+            return copia;
+          });
+          toast("Não foi possível salvar o progresso", "erro");
+        }
+      }, 600);
+    },
+    [user, progressoLocal, toast]
+  );
 
   function abrirCriar() {
     setEditando(null);
@@ -74,6 +138,28 @@ export default function MateriasPage() {
     } finally {
       setEnviando(false);
     }
+  }
+
+  async function handleCapa(m: Materia, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // permite reenviar o mesmo arquivo depois
+    if (!file || !user) return;
+    setEnviandoCapa(m.id);
+    try {
+      const dataUrl = await comprimirImagem(file, IMAGEM_CAPA);
+      await definirCapaMateria(user.uid, m.id, dataUrl);
+      toast("Capa atualizada");
+    } catch (err) {
+      toast(err instanceof Error ? err.message : "Não foi possível usar essa imagem", "erro");
+    } finally {
+      setEnviandoCapa(null);
+    }
+  }
+
+  async function handleRemoverCapa(m: Materia) {
+    if (!user) return;
+    await definirCapaMateria(user.uid, m.id, null);
+    toast("Capa removida");
   }
 
   async function handleRemover(m: Materia) {
@@ -114,8 +200,43 @@ export default function MateriasPage() {
           {materias.map((m) => (
             <li
               key={m.id}
-              className="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-md"
+              className="group overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-slate-200/80 transition hover:-translate-y-0.5 hover:shadow-md"
             >
+              {/* Capa: imagem enviada ou gradiente derivado do nome */}
+              <div className="relative h-24 w-full overflow-hidden">
+                {m.capa ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={m.capa} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className={`h-full w-full bg-gradient-to-br ${gradienteDoNome(m.nome)}`} />
+                )}
+
+                <div className="absolute inset-x-0 bottom-0 flex justify-end gap-1.5 p-2 opacity-0 transition group-hover:opacity-100">
+                  <label
+                    className={`cursor-pointer rounded-lg bg-white/90 px-2.5 py-1 text-xs font-medium text-slate-700 shadow-sm backdrop-blur transition hover:bg-white ${
+                      enviandoCapa === m.id ? "pointer-events-none opacity-60" : ""
+                    }`}
+                  >
+                    {enviandoCapa === m.id ? "Enviando..." : m.capa ? "Trocar capa" : "Adicionar capa"}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="sr-only"
+                      onChange={(e) => handleCapa(m, e)}
+                    />
+                  </label>
+                  {m.capa && (
+                    <button
+                      onClick={() => handleRemoverCapa(m)}
+                      className="rounded-lg bg-white/90 px-2.5 py-1 text-xs font-medium text-red-600 shadow-sm backdrop-blur transition hover:bg-white"
+                    >
+                      Remover
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="p-5">
               <div className="flex items-start justify-between gap-3">
                 <span
                   className={`inline-flex h-9 w-9 items-center justify-center rounded-lg ${ENTIDADES.materias.chip}`}
@@ -142,21 +263,51 @@ export default function MateriasPage() {
                 </div>
               </div>
               <p className="mt-3 font-semibold text-slate-900">{m.nome}</p>
-              <div className="mt-2 flex items-center gap-3">
-                <div className="h-2 flex-1 rounded-full bg-slate-100">
-                  <div
-                    className="h-2 rounded-full bg-blue-600 transition-all"
-                    style={{ width: `${m.prog}%` }}
-                  />
-                </div>
-                <span className="text-xs font-medium text-slate-500">{m.prog}%</span>
+              {(() => {
+                const prog = progressoLocal[m.id] ?? m.prog;
+                return (
+                  <>
+                    <div className="mt-2 h-2 w-full rounded-full bg-slate-100">
+                      <div
+                        className="h-2 rounded-full bg-blue-600 transition-all duration-300"
+                        style={{ width: `${prog}%` }}
+                      />
+                    </div>
+                    <div className="mt-2.5 flex items-center justify-between gap-2">
+                      <button
+                        onClick={() => ajustarProgresso(m, -PASSO_PROGRESSO)}
+                        disabled={prog === 0}
+                        aria-label={`Diminuir progresso de ${m.nome}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900 disabled:opacity-40 disabled:hover:bg-transparent"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-4 w-4">
+                          <path strokeLinecap="round" d="M5 12h14" />
+                        </svg>
+                      </button>
+                      <span className="text-sm font-semibold tabular-nums text-slate-700">
+                        {prog}%
+                      </span>
+                      <button
+                        onClick={() => ajustarProgresso(m, PASSO_PROGRESSO)}
+                        disabled={prog === 100}
+                        aria-label={`Aumentar progresso de ${m.nome}`}
+                        className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 disabled:opacity-40 disabled:hover:bg-transparent"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.2} className="h-4 w-4">
+                          <path strokeLinecap="round" d="M12 5v14M5 12h14" />
+                        </svg>
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
               </div>
             </li>
           ))}
         </ul>
       )}
 
-      <SlideOver
+      <Modal
         aberto={aberto}
         onFechar={() => setAberto(false)}
         titulo={editando ? "Editar matéria" : "Nova matéria"}
@@ -194,7 +345,7 @@ export default function MateriasPage() {
             {enviando ? "Salvando..." : editando ? "Salvar alterações" : "Adicionar matéria"}
           </Botao>
         </form>
-      </SlideOver>
+      </Modal>
     </div>
   );
 }
