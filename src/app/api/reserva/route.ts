@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { reservaInputSchema } from "@/lib/validators/studyflow";
+import { reservaInputSchema } from "@/lib/validators/dominio";
 import { registrarReserva } from "@/lib/data/reservasAdmin";
 import { jaLancou } from "@/lib/launch";
 
@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   // Depois do lançamento, as reservas de fundador encerram.
   if (jaLancou()) {
     return NextResponse.json(
-      { erro: "As reservas de fundador foram encerradas — o Study Flow já está no ar." },
+      { erro: "As reservas de fundador foram encerradas — o Nexo Study já está no ar." },
       { status: 403 }
     );
   }

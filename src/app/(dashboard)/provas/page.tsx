@@ -20,7 +20,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import { diasAte, formatarDataCurta, hojeISO } from "@/lib/ui/datas";
-import type { Materia, Prova } from "@/types/studyflow";
+import type { Materia, Prova } from "@/types/dominio";
 
 const TIPOS = ["Prova", "Simulado"];
 

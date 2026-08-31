@@ -1,5 +1,5 @@
 import { dataLocalISO, hojeISO } from "@/lib/ui/datas";
-import type { SessaoFoco } from "@/types/studyflow";
+import type { SessaoFoco } from "@/types/dominio";
 
 // Agregações das sessões de foco, num só lugar — o dashboard e a tela de
 // gráficos mostravam os mesmos números calculados de formas diferentes.

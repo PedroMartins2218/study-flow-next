@@ -14,8 +14,8 @@ import { getFirebaseDb } from "@/lib/firebase/client";
 import {
   atividadeInputSchema,
   type AtividadeInput,
-} from "@/lib/validators/studyflow";
-import type { Atividade, SituacaoTarefa } from "@/types/studyflow";
+} from "@/lib/validators/dominio";
+import type { Atividade, SituacaoTarefa } from "@/types/dominio";
 
 function atividadesRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "atividades");

@@ -10,7 +10,7 @@ import { Icone } from "@/components/ui/Icone";
 import { useToast } from "@/components/ui/Toast";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import { hojeISO } from "@/lib/ui/datas";
-import type { Materia, SessaoFoco } from "@/types/studyflow";
+import type { Materia, SessaoFoco } from "@/types/dominio";
 
 const DURACOES_MIN = [15, 25, 30, 50];
 const DURACAO_PADRAO_MIN = 25;

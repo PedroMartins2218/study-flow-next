@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { kirvanoWebhookSchema } from "@/lib/validators/studyflow";
+import { kirvanoWebhookSchema } from "@/lib/validators/dominio";
 import { processarEvento, tokenValido } from "@/lib/data/kirvanoWebhook";
 
 // Webhook de pagamento da Kirvano — é o que libera acesso sem intervenção

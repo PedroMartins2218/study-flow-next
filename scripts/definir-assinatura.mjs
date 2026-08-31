@@ -85,13 +85,16 @@ async function main() {
   else if (status === "ativo") dados.expiracao = somarUmMes(hojeISO());
 
   if (planoArg) dados.plano = planoArg;
-  else if (tier) dados.plano = tier === "pro" ? "Study Flow Pro" : "Study Flow Base";
+  else if (tier) dados.plano = tier === "pro" ? "Nexo Study Pro" : "Nexo Study Base";
 
   dados.fonte = "manual";
 
   await db.collection("assinaturas").doc(usuario.uid).set(dados, { merge: true });
 
-  const { atualizadoEm, ...visivel } = dados;
+  // `atualizadoEm` é um sentinel do servidor (não tem valor legível aqui),
+  // então fica de fora do que imprimimos no terminal.
+  const visivel = { ...dados };
+  delete visivel.atualizadoEm;
   console.log(`\nAssinatura de ${email} atualizada (uid ${usuario.uid}):`);
   for (const [k, v] of Object.entries(visivel)) console.log(`   ${k.padEnd(10)} ${v}`);
   console.log(

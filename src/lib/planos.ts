@@ -1,4 +1,4 @@
-import type { TierAssinatura } from "@/types/studyflow";
+import type { TierAssinatura } from "@/types/dominio";
 
 // Fonte única de preço e copy dos planos. A landing e a tela de assinatura
 // leem daqui — mudou o preço, muda só neste arquivo.

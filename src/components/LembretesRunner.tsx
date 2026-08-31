@@ -30,7 +30,7 @@ export function LembretesRunner() {
         msgs.slice(0, 3).forEach((m, i) =>
           setTimeout(() => {
             try {
-              new Notification("Study Flow", { body: m });
+              new Notification("Nexo Study", { body: m });
             } catch {
               // ignora se o navegador bloquear
             }

@@ -19,7 +19,7 @@ import type {
   Prova,
   SessaoFoco,
   Trabalho,
-} from "@/types/studyflow";
+} from "@/types/dominio";
 
 const DIAS_SEMANA = ["domingo", "segunda", "terça", "quarta", "quinta", "sexta", "sábado"];
 const MESES = [

@@ -7,7 +7,7 @@ import { criarAtividade } from "@/lib/data/atividades";
 import { criarTrabalho } from "@/lib/data/trabalhos";
 import { criarProva } from "@/lib/data/provas";
 import { formatarDataCurta } from "@/lib/ui/datas";
-import type { TarefaExtraida } from "@/lib/validators/studyflow";
+import type { TarefaExtraida } from "@/lib/validators/dominio";
 
 const ROTULO: Record<TarefaExtraida["tipo"], string> = {
   atividade: "Atividade",

@@ -14,7 +14,7 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
-import type { TarefaExtraida } from "@/lib/validators/studyflow";
+import type { TarefaExtraida } from "@/lib/validators/dominio";
 
 /**
  * Conversas com o Agente de IA.

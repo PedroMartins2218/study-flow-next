@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Logo } from "@/components/marketing/Logo";
 
 export const metadata: Metadata = {
-  title: "Compra confirmada — Study Flow",
+  title: "Compra confirmada — Nexo Study",
   robots: { index: false, follow: false },
 };
 
@@ -46,7 +46,7 @@ export default async function ObrigadoPage({
           Pagamento recebido!
         </h1>
         <p className="mt-2 text-sm text-slate-600">
-          Falta só um passo para liberar seu acesso: criar sua conta no Study Flow.
+          Falta só um passo para liberar seu acesso: criar sua conta no Nexo Study.
         </p>
 
         <div className="mt-6 rounded-xl bg-amber-50 px-4 py-3 text-left">

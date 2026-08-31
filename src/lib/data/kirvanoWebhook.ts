@@ -9,8 +9,8 @@ import {
   lerAssinatura,
 } from "@/lib/data/assinaturaAdmin";
 import { hojeISO, ontemISO, proximaExpiracao, somarUmMes } from "@/lib/data/assinaturaCore";
-import type { KirvanoWebhook } from "@/lib/validators/studyflow";
-import type { TierAssinatura } from "@/types/studyflow";
+import type { KirvanoWebhook } from "@/lib/validators/dominio";
+import type { TierAssinatura } from "@/types/dominio";
 
 /**
  * Tradução dos eventos da Kirvano para o estado da assinatura.
@@ -181,7 +181,7 @@ export async function processarEvento(
     return { aplicado: false, detalhe: "e-mail não encontrado no payload" };
   }
 
-  const plano = tier === "pro" ? "Study Flow Pro" : "Study Flow Base";
+  const plano = tier === "pro" ? "Nexo Study Pro" : "Nexo Study Base";
 
   if (efeito.acao === "ativar") {
     const uid = await buscarUidPorEmail(email);

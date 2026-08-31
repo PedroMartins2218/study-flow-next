@@ -12,8 +12,8 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
-import { materiaInputSchema, type MateriaInput } from "@/lib/validators/studyflow";
-import type { Materia } from "@/types/studyflow";
+import { materiaInputSchema, type MateriaInput } from "@/lib/validators/dominio";
+import type { Materia } from "@/types/dominio";
 
 function materiasRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "materias");

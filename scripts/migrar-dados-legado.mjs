@@ -4,7 +4,7 @@
 //   usuarios/{email}       -> { materias: [], atividades: [], trabalhos: [], provas: [], sessoes: [] }
 //   assinaturas/{email}    -> { status, expiracao, ... }
 //
-// Modelo novo (study-flow-next):
+// Modelo novo (nexo-study):
 //   usuarios/{uid}/materias/{id}
 //   usuarios/{uid}/atividades/{id}
 //   usuarios/{uid}/trabalhos/{id}

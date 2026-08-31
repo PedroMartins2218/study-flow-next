@@ -1,6 +1,6 @@
 import { doc, onSnapshot, type Unsubscribe } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
-import type { Assinatura } from "@/types/studyflow";
+import type { Assinatura } from "@/types/dominio";
 
 // As regras de acesso vivem em assinaturaCore.ts (sem Firebase) para o servidor
 // poder aplicar as mesmas. Reexportadas aqui para o cliente não precisar saber

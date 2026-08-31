@@ -123,7 +123,7 @@ export default function ConfiguracoesPage() {
       return;
     }
     try {
-      new Notification("Study Flow", { body: "Tudo certo! Você vai receber lembretes assim." });
+      new Notification("Nexo Study", { body: "Tudo certo! Você vai receber lembretes assim." });
     } catch {
       toast("Não foi possível enviar agora", "erro");
     }
@@ -201,7 +201,7 @@ export default function ConfiguracoesPage() {
       <div className="mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
         <h2 className="text-sm font-semibold text-slate-700">Notificações</h2>
         <p className="mt-1 text-xs text-slate-500">
-          Receba lembretes de provas, atividades e trabalhos ao abrir o Study Flow.
+          Receba lembretes de provas, atividades e trabalhos ao abrir o Nexo Study.
         </p>
 
         <label className="mt-4 flex cursor-pointer items-center justify-between gap-3">

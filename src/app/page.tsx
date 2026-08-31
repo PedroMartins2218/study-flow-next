@@ -97,7 +97,7 @@ const FUNCOES = [
 const PERGUNTAS = [
   {
     q: "Preciso de cartão de crédito?",
-    a: "O pagamento é feito com segurança direto no checkout da Kirvano, que aceita cartão e outras formas de pagamento disponíveis por lá. O Study Flow não coleta nem armazena dados de pagamento.",
+    a: "O pagamento é feito com segurança direto no checkout da Kirvano, que aceita cartão e outras formas de pagamento disponíveis por lá. O Nexo Study não coleta nem armazena dados de pagamento.",
   },
   {
     q: "Qual a diferença entre o Base e o Pro?",
@@ -113,11 +113,11 @@ const PERGUNTAS = [
   },
   {
     q: "Funciona no celular?",
-    a: "Sim. O Study Flow funciona direto pelo navegador, no computador ou no celular, sem precisar instalar nada.",
+    a: "Sim. O Nexo Study funciona direto pelo navegador, no computador ou no celular, sem precisar instalar nada.",
   },
   {
     q: "É cursinho ou tem aulas?",
-    a: "Não. O Study Flow não é cursinho e não vende aulas ou conteúdo. É uma ferramenta de organização e acompanhamento da sua rotina de estudos, para usar junto do material que você já estuda.",
+    a: "Não. O Nexo Study não é cursinho e não vende aulas ou conteúdo. É uma ferramenta de organização e acompanhamento da sua rotina de estudos, para usar junto do material que você já estuda.",
   },
   {
     q: "Em quanto tempo tenho acesso após assinar?",
@@ -210,7 +210,7 @@ export default function LandingPage() {
             </div>
             <Image
               src={dashboardPreview}
-              alt="Dashboard do Study Flow com resumo de matérias, atividades, trabalhos e foco do dia"
+              alt="Dashboard do Nexo Study com resumo de matérias, atividades, trabalhos e foco do dia"
               priority
               className="w-full h-auto"
             />
@@ -229,7 +229,7 @@ export default function LandingPage() {
               Estudar sem organização cansa o dobro
             </h2>
             <p className="mt-3 text-sm text-slate-500 sm:text-base">
-              Não é falta de esforço — é falta de estrutura. O Study Flow
+              Não é falta de esforço — é falta de estrutura. O Nexo Study
               existe para resolver exatamente isso.
             </p>
           </div>
@@ -325,7 +325,7 @@ export default function LandingPage() {
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <h3 className="font-semibold">Study Flow {plano.nome}</h3>
+                  <h3 className="font-semibold">Nexo Study {plano.nome}</h3>
                   {plano.destaque && (
                     <span
                       className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
@@ -448,7 +448,7 @@ export default function LandingPage() {
           </h2>
           <p className="mx-auto mt-3 max-w-md text-sm text-blue-100 sm:text-base">
             Estrutura, clareza e constância — a partir de R$ 29,90/mês, você tem
-            acesso ao Study Flow agora mesmo.
+            acesso ao Nexo Study agora mesmo.
           </p>
           <a
             href="#planos"
@@ -470,7 +470,7 @@ export default function LandingPage() {
         <div className="mx-auto flex w-full max-w-5xl flex-col items-center gap-4 text-center">
           <Logo />
           <p className="max-w-xl text-xs text-slate-400">
-            Study Flow — organização e acompanhamento de estudos. O Study Flow não
+            Nexo Study — organização e acompanhamento de estudos. O Nexo Study não
             promete aprovação; ele te dá estrutura, clareza e constância.
           </p>
         </div>

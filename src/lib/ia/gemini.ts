@@ -7,7 +7,7 @@ import {
   type RespostaChat,
   type ResumoIa,
   type TarefaExtraida,
-} from "@/lib/validators/studyflow";
+} from "@/lib/validators/dominio";
 import { hojeISO } from "@/lib/data/assinaturaCore";
 
 // Cliente do Gemini via REST — sem SDK novo no bundle. A chave nunca sai do
@@ -250,7 +250,7 @@ const SCHEMA_CHAT = {
 
 function instrucaoChat(hoje: string, materias: string[]): string {
   return [
-    "Você é o assistente de estudos do Study Flow, um aplicativo brasileiro de organização de rotina de estudos.",
+    "Você é o assistente de estudos do Nexo Study, um aplicativo brasileiro de organização de rotina de estudos.",
     "Fala com estudantes de ensino médio, vestibulandos e universitários, em português do Brasil.",
     "",
     "Como você se comporta:",
@@ -258,7 +258,7 @@ function instrucaoChat(hoje: string, materias: string[]): string {
     "- Respostas curtas por padrão. Aprofunde só quando pedirem.",
     "- Você ajuda a explicar matéria, resumir conteúdo, montar plano de estudos e organizar prazos.",
     "- Se não souber, diga que não sabe. Nunca invente datas, fórmulas ou fatos.",
-    "- Não prometa aprovação em prova ou concurso: o Study Flow entrega organização e constância.",
+    "- Não prometa aprovação em prova ou concurso: o Nexo Study entrega organização e constância.",
     "",
     "Campo `resposta`: o que você fala na conversa. Use texto simples.",
     "Pode usar listas com hífen quando ajudar a ler, mas não use markdown de títulos, negrito ou tabelas.",

@@ -1,7 +1,7 @@
 const PERFIS = [
   {
     titulo: "Vestibulando",
-    desc: "Muita matéria, redação toda semana e simulado chegando. O Study Flow reúne prazos e progresso num painel só, pra você parar de depender da memória.",
+    desc: "Muita matéria, redação toda semana e simulado chegando. O Nexo Study reúne prazos e progresso num painel só, pra você parar de depender da memória.",
     icone: (
       <path
         strokeLinecap="round"
@@ -46,7 +46,7 @@ export function Testimonials() {
             Feito para quem precisa se organizar de verdade
           </h2>
           <p className="mt-3 text-sm text-slate-500 sm:text-base">
-            Não importa o objetivo — se a rotina de estudo é puxada, o Study Flow
+            Não importa o objetivo — se a rotina de estudo é puxada, o Nexo Study
             dá a estrutura pra você seguir com clareza e constância.
           </p>
         </div>

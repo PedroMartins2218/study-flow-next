@@ -20,7 +20,7 @@ import { CardsSkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { formatarDataCurta } from "@/lib/ui/datas";
-import type { Anotacao, Materia } from "@/types/studyflow";
+import type { Anotacao, Materia } from "@/types/dominio";
 
 export default function CadernoPage() {
   const { user } = useAuth();

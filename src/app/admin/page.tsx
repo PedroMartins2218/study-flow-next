@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import type { Reserva } from "@/types/studyflow";
+import type { Reserva } from "@/types/dominio";
 
 const CHAVE_STORAGE = "sf_admin_key";
 
@@ -64,7 +64,7 @@ export default function AdminPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `reservas-studyflow-${new Date().toISOString().split("T")[0]}.csv`;
+    a.download = `reservas-nexostudy-${new Date().toISOString().split("T")[0]}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

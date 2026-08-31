@@ -1,4 +1,4 @@
-# Study Flow — marca e identidade visual
+# Nexo Study — marca e identidade visual
 
 > Documento de referência para marketing, copy e design.
 > Tudo aqui foi extraído do produto real (código, telas e decisões registradas),
@@ -6,7 +6,7 @@
 
 ---
 
-## 1. O que é o Study Flow
+## 1. O que é o Nexo Study
 
 **O painel operacional do estudante.**
 
@@ -21,6 +21,22 @@ universitários.
 **O que NÃO é:** não é cursinho, não vende aulas nem conteúdo. É a ferramenta que
 organiza o material que a pessoa já estuda.
 
+### O nome: de Study Flow a Nexo Study (31/08/2026)
+
+O produto se chamou **Study Flow** do início até 31/08/2026. A troca veio de uma
+oportunidade: o projeto foi **selecionado para a PGTEC**, feira de tecnologia
+sustentável de Praia Grande. No contexto da feira ele não pode ser anunciado como
+produto pago — e pausar a monetização de um sistema pronto não fazia sentido.
+
+**Nexo Study** resolve os dois lados: libera a venda em paralelo à feira e liga o
+produto ao futuro **ecossistema Nexo**, a marca-guarda-chuva do fundador.
+
+**A identidade visual não mudou** — mesmas cores, mesmo layout, mesmo monograma
+**"ST"**, que segue servindo para Nexo **ST**udy.
+
+Ao escrever copy: use **Nexo Study** por extenso. "Nexo" sozinho refere-se ao
+ecossistema, não ao produto de estudos.
+
 ---
 
 ## 2. A promessa (e o limite dela)
@@ -29,10 +45,10 @@ organiza o material que a pessoa já estuda.
 
 Esta é a promessa central, e ela tem um limite deliberado:
 
-### ⛔ O Study Flow nunca promete aprovação
+### ⛔ O Nexo Study nunca promete aprovação
 
 Regra registrada desde o início do projeto e visível no rodapé do site:
-*"O Study Flow não promete aprovação; ele te dá estrutura, clareza e constância."*
+*"O Nexo Study não promete aprovação; ele te dá estrutura, clareza e constância."*
 
 Isso não é modéstia de marketing — é honestidade sobre o que uma ferramenta de
 organização pode entregar. Copy que prometa passar em prova, concurso ou
@@ -126,18 +142,26 @@ pelo **nome exato**. `bg-slate-50` tem regra; `bg-slate-50/60` (com opacidade)
 
 ### Tipografia
 
-**Situação atual:** o produto **carrega a fonte Geist mas renderiza em Arial** —
-o `globals.css` declara Arial no `body` e sobrepõe a fonte carregada. Verificado
-no navegador: títulos, parágrafos e botões saem todos em Arial.
+**Decidido em 31/08/2026: a pilha do sistema (Arial/Helvetica).**
 
-👉 **Decisão pendente** antes de produzir qualquer material de marca. Ver
-`docs/PENDENCIAS.md`. Não faz sentido fechar um manual tipográfico enquanto o
-produto não decidir qual fonte usa.
+Durante meses o produto carregava a fonte Geist mas renderizava em Arial — o
+`globals.css` declara Arial no `body` e sobrepunha a fonte baixada. Confirmado
+que `font-sans` e `font-mono` não eram usados por nenhum componente: a Geist era
+peso morto. O carregamento foi removido, economizando duas requisições ao Google
+Fonts **sem mudar um pixel**.
+
+👉 Para material de marca, use **Arial** (ou Helvetica). É a fonte real do
+produto — peça de marketing em outra fonte não vai casar com as telas.
 
 ### Logo
 
-- `public/logo-mark.png` — monograma, usado sozinho no app
-- `public/logo.png` — logo completa (monograma + "Study Flow"), para usos maiores
+- `public/logo-mark.png` — monograma "ST", usado sozinho no app. **Continua
+  válido após o rebrand**
+- ⚠️ `public/logo.png` — logo completa, mas com o wordmark **"Study Flow"**
+  embutido. **Está desatualizada** e precisa ser redesenhada. Nenhum componente
+  a usa hoje, então não aparece no produto — mas não use em material de marketing
+- ⚠️ `public/marketing/dashboard-preview.png` — o print do produto ainda mostra
+  "Study Flow" na sidebar. **Precisa ser recapturado antes de qualquer peça**
 - Em fundo escuro, o monograma vai **dentro de um chip branco** para garantir contraste
 - O wordmark é `font-bold` com `tracking-tight`
 
@@ -153,7 +177,7 @@ produto não decidir qual fonte usa.
 Argumentos de venda usados: sem fidelidade, cancela quando quiser, acesso pelo
 navegador sem instalar nada, e o comparativo por dia ("menos de R$ 1 por dia").
 
-Pagamento pela **Kirvano**. O Study Flow não coleta nem armazena dados de
+Pagamento pela **Kirvano**. O Nexo Study não coleta nem armazena dados de
 pagamento — e isso é dito na FAQ, porque é diferencial de confiança.
 
 ---
@@ -162,7 +186,7 @@ pagamento — e isso é dito na FAQ, porque é diferencial de confiança.
 
 Estas informações não existem em lugar nenhum do projeto e só o Pedro tem:
 
-- [ ] **A história de origem.** Por que o Study Flow foi criado? Que problema
+- [ ] **A história de origem.** Por que o Nexo Study foi criado? Que problema
       pessoal do Pedro deu origem a ele? É o material mais valioso para redes
       sociais e página de vendas, e não dá para inventar.
 - [ ] **Público prioritário.** Vestibulando, concurseiro ou universitário? O
@@ -174,6 +198,6 @@ Estas informações não existem em lugar nenhum do projeto e só o Pedro tem:
 
 ## 8. Referências rápidas
 
-- **Produção:** https://study-flow-app-449.netlify.app
+- **Produção:** https://nexo-study-app-449.netlify.app
 - **Print do produto:** `public/marketing/dashboard-preview.png`
 - **Estado técnico:** `CONTEXTO.md` e `docs/ESTADO-DO-PROJETO.md`

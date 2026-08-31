@@ -1,34 +1,27 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// A tipografia do app é a pilha do sistema (Arial), definida no globals.css.
+// Não carregamos fonte externa de propósito: economiza duas requisições ao
+// Google Fonts em cada visita.
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://study-flow-app-449.netlify.app"),
-  title: "Study Flow — organize seus estudos",
+  metadataBase: new URL("https://nexo-study-app-449.netlify.app"),
+  title: "Nexo Study — organize seus estudos",
   description: "Organize seus estudos, acompanhe sua evolução e transforme foco em resultado.",
   openGraph: {
-    title: "Study Flow — organize seus estudos",
+    title: "Nexo Study — organize seus estudos",
     description:
       "Matérias, atividades, provas, caderno e modo foco num só painel. Planos a partir de R$ 29,90/mês.",
-    url: "https://study-flow-app-449.netlify.app",
-    siteName: "Study Flow",
+    url: "https://nexo-study-app-449.netlify.app",
+    siteName: "Nexo Study",
     locale: "pt_BR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Study Flow — organize seus estudos",
+    title: "Nexo Study — organize seus estudos",
     description: "Matérias, atividades, provas, caderno e modo foco num só painel.",
   },
 };
@@ -42,7 +35,7 @@ export default function RootLayout({
     <html
       lang="pt-BR"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col bg-slate-50">
         {/* Aplica o tema escuro antes da primeira pintura, evitando "flash" */}

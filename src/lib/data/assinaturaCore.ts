@@ -1,4 +1,4 @@
-import type { Assinatura, StatusAssinatura } from "@/types/studyflow";
+import type { Assinatura, StatusAssinatura } from "@/types/dominio";
 
 // Regras de acesso puras — sem nenhum import do Firebase.
 // Isto existe separado de `assinatura.ts` (que importa firebase/firestore, e

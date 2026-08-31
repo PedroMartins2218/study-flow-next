@@ -4,7 +4,7 @@ import { lerAssinatura } from "@/lib/data/assinaturaAdmin";
 import { temAcessoIa } from "@/lib/data/assinaturaCore";
 import { estornarCota, lerCota, reservarCota } from "@/lib/data/usoIaAdmin";
 import { conversar, ErroIa } from "@/lib/ia/gemini";
-import { chatIaInputSchema } from "@/lib/validators/studyflow";
+import { chatIaInputSchema } from "@/lib/validators/dominio";
 
 // Conversa com o Agente de IA (exclusivo do plano Pro).
 //

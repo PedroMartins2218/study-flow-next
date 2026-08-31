@@ -19,7 +19,7 @@ import { CardsSkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
-import type { Materia } from "@/types/studyflow";
+import type { Materia } from "@/types/dominio";
 
 const PASSO_PROGRESSO = 5;
 

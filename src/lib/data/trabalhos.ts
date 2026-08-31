@@ -14,8 +14,8 @@ import { getFirebaseDb } from "@/lib/firebase/client";
 import {
   trabalhoInputSchema,
   type TrabalhoInput,
-} from "@/lib/validators/studyflow";
-import type { SituacaoTarefa, Trabalho } from "@/types/studyflow";
+} from "@/lib/validators/dominio";
+import type { SituacaoTarefa, Trabalho } from "@/types/dominio";
 
 function trabalhosRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "trabalhos");

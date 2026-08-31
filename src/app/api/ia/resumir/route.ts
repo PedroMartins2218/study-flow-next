@@ -4,7 +4,7 @@ import { lerAssinatura } from "@/lib/data/assinaturaAdmin";
 import { temAcessoIa } from "@/lib/data/assinaturaCore";
 import { estornarCota, reservarCota } from "@/lib/data/usoIaAdmin";
 import { ErroIa, resumirTexto } from "@/lib/ia/gemini";
-import { resumirIaInputSchema } from "@/lib/validators/studyflow";
+import { resumirIaInputSchema } from "@/lib/validators/dominio";
 
 // Resumo com IA (exclusivo do plano Pro).
 //

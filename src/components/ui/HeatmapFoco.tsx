@@ -3,11 +3,11 @@
 import { useMemo } from "react";
 import { dataLocalISO } from "@/lib/ui/datas";
 import { formatarMinutos, minutosPorDia } from "@/lib/ui/estatisticas";
-import type { SessaoFoco } from "@/types/studyflow";
+import type { SessaoFoco } from "@/types/dominio";
 
 // Calendário de constância no estilo "contribuições": uma coluna por semana,
 // uma linha por dia da semana. Mostra de relance se a rotina está de pé —
-// que é o que o Study Flow promete (constância, não aprovação).
+// que é o que o Nexo Study promete (constância, não aprovação).
 
 const SEMANAS = 18;
 const DIAS_SEMANA = ["D", "S", "T", "Q", "Q", "S", "S"];

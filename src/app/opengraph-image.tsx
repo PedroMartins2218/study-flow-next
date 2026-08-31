@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Study Flow — organize seus estudos e transforme foco em resultado";
+export const alt = "Nexo Study — organize seus estudos e transforme foco em resultado";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -39,7 +39,7 @@ export default function OpengraphImage() {
           >
             ST
           </div>
-          <div style={{ fontSize: 38, fontWeight: 700 }}>Study Flow</div>
+          <div style={{ fontSize: 38, fontWeight: 700 }}>Nexo Study</div>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column" }}>

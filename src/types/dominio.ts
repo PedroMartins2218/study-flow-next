@@ -84,7 +84,7 @@ export type StatusAssinatura =
   | "expirado"
   | "inativo";
 
-// O que a pessoa comprou. Separado de `plano` (rótulo livre, ex.: "Study Flow
+// O que a pessoa comprou. Separado de `plano` (rótulo livre, ex.: "Nexo Study
 // Pro") porque é isto — e só isto — que libera ou bloqueia o Agente de IA.
 export type TierAssinatura = "base" | "pro";
 

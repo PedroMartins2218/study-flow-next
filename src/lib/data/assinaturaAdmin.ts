@@ -2,7 +2,7 @@ import "server-only";
 
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminAuth, getAdminFirestore } from "@/lib/firebase/admin";
-import type { Assinatura, StatusAssinatura, TierAssinatura } from "@/types/studyflow";
+import type { Assinatura, StatusAssinatura, TierAssinatura } from "@/types/dominio";
 
 export interface DadosAssinatura {
   status: StatusAssinatura;

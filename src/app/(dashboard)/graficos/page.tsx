@@ -25,7 +25,7 @@ import {
   ultimosDias,
 } from "@/lib/ui/estatisticas";
 import { useTemaEscuro } from "@/lib/ui/useTemaEscuro";
-import type { Materia, SessaoFoco } from "@/types/studyflow";
+import type { Materia, SessaoFoco } from "@/types/dominio";
 
 function CardEstatistica({
   rotulo,

@@ -21,7 +21,7 @@ export async function ativarTrialSeElegivel(
   if (!jaLancou()) {
     return {
       ok: false,
-      motivo: "O Study Flow ainda não abriu. Volte no dia do lançamento!",
+      motivo: "O Nexo Study ainda não abriu. Volte no dia do lançamento!",
       status: 403,
     };
   }

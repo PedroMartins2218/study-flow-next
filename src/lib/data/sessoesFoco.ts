@@ -11,9 +11,9 @@ import { getFirebaseDb } from "@/lib/firebase/client";
 import {
   sessaoFocoInputSchema,
   type SessaoFocoInput,
-} from "@/lib/validators/studyflow";
+} from "@/lib/validators/dominio";
 import { dataLocalISO } from "@/lib/ui/datas";
-import type { SessaoFoco } from "@/types/studyflow";
+import type { SessaoFoco } from "@/types/dominio";
 
 function sessoesRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "sessoes");

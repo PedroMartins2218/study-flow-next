@@ -2,8 +2,8 @@ import "server-only";
 
 import { getAdminFirestore } from "@/lib/firebase/admin";
 import { FieldValue } from "firebase-admin/firestore";
-import type { ReservaInput } from "@/lib/validators/studyflow";
-import type { Reserva } from "@/types/studyflow";
+import type { ReservaInput } from "@/lib/validators/dominio";
+import type { Reserva } from "@/types/dominio";
 
 // Grava um lead de reserva (pré-lançamento) na coleção `reservas`.
 // Escrita só acontece aqui, no servidor, via Admin SDK — a coleção fica

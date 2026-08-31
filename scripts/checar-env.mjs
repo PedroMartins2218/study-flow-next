@@ -133,5 +133,5 @@ if (faltando === 0 && comProblema === 0) {
 console.log(
   `  Resumo: ${faltando} obrigatória(s) faltando, ${comProblema} com problema de formato.`
 );
-console.log("  Arquivo: .env.local (na pasta study-flow-next-repo)\n");
+console.log("  Arquivo: .env.local (na raiz do projeto)\n");
 process.exit(1);

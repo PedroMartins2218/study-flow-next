@@ -1,6 +1,6 @@
-# Study Flow — Next.js
+# Nexo Study — Next.js
 
-Nova base do Study Flow, em reconstrução a partir do MVP estático
+Nova base do Nexo Study, em reconstrução a partir do MVP estático
 (`index.html` / `dashboard.html`, na raiz do repositório). Essa versão antiga
 continua no ar e não deve ser apagada — este projeto é desenvolvido em
 paralelo até estar pronto para substituí-la.
@@ -47,7 +47,7 @@ src/
     auth/AuthProvider.tsx  # Contexto de autenticação (useAuth)
     data/                 # CRUD tipado por coleção (materias, atividades)
     validators/           # Schemas Zod para validar dados antes de salvar
-  types/studyflow.ts       # Tipos de domínio (Materia, Atividade, ...)
+  types/dominio.ts         # Tipos de domínio (Materia, Atividade, ...)
 firestore.rules            # Regras de segurança do Firestore
 ```
 

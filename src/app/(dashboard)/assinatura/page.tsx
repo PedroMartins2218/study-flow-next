@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { assinaturaEstaAtiva, subscribeToAssinatura } from "@/lib/data/assinatura";
 import { PLANOS, PLANO_PRO, planoDoTier, type Plano } from "@/lib/planos";
-import type { Assinatura } from "@/types/studyflow";
+import type { Assinatura } from "@/types/dominio";
 
 function CardPlano({ plano, compacto = false }: { plano: Plano; compacto?: boolean }) {
   const ehPro = plano.tier === "pro";
@@ -19,7 +19,7 @@ function CardPlano({ plano, compacto = false }: { plano: Plano; compacto?: boole
       }`}
     >
       <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold">Study Flow {plano.nome}</h3>
+        <h3 className="font-semibold">Nexo Study {plano.nome}</h3>
         {plano.destaque && (
           <span
             className={`rounded-full px-2.5 py-1 text-xs font-semibold ${

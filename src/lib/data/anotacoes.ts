@@ -14,8 +14,8 @@ import { getFirebaseDb } from "@/lib/firebase/client";
 import {
   anotacaoInputSchema,
   type AnotacaoInput,
-} from "@/lib/validators/studyflow";
-import type { Anotacao } from "@/types/studyflow";
+} from "@/lib/validators/dominio";
+import type { Anotacao } from "@/types/dominio";
 
 function anotacoesRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "anotacoes");

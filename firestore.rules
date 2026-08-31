@@ -4,7 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // Aceita dois formatos de "dono do documento" durante a transição:
-    // - uid do Firebase Auth (novo app, study-flow-next)
+    // - uid do Firebase Auth (novo app, nexo-study)
     // - e-mail do usuário (app antigo, dashboard.html, que usa email como ID)
     // Um uid nunca é igual a um e-mail, então não há risco de colisão.
     function isOwnerDoc(docId) {

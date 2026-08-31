@@ -9,7 +9,7 @@ import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import { PerfilProvider } from "@/lib/perfil/PerfilProvider";
 import { LembretesRunner } from "@/components/LembretesRunner";
 import { assinaturaEstaAtiva, subscribeToAssinatura } from "@/lib/data/assinatura";
-import type { Assinatura } from "@/types/studyflow";
+import type { Assinatura } from "@/types/dominio";
 
 const ROTA_ASSINATURA = "/assinatura";
 

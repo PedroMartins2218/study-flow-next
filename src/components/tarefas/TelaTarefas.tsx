@@ -19,7 +19,7 @@ import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { ENTIDADES } from "@/lib/ui/entidades";
 import { formatarDataCurta, hojeISO } from "@/lib/ui/datas";
-import type { Materia, SituacaoTarefa } from "@/types/studyflow";
+import type { Materia, SituacaoTarefa } from "@/types/dominio";
 
 export type Tarefa = {
   id: string;

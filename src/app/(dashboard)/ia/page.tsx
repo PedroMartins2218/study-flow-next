@@ -18,8 +18,8 @@ import {
   type Conversa,
   type Mensagem,
 } from "@/lib/data/conversas";
-import type { Materia } from "@/types/studyflow";
-import type { TarefaExtraida } from "@/lib/validators/studyflow";
+import type { Materia } from "@/types/dominio";
+import type { TarefaExtraida } from "@/lib/validators/dominio";
 
 const SUGESTOES = [
   "Me ajuda a montar um plano de estudos para as provas deste mês",
@@ -559,7 +559,7 @@ export default function AgenteIaPage() {
         <div id="impressao">
           <h1 style={{ fontWeight: 700, marginBottom: 4 }}>{paraImprimir.titulo}</h1>
           <p style={{ fontSize: "10pt", color: "#555", marginBottom: 18 }}>
-            Gerado pelo Agente de IA do Study Flow
+            Gerado pelo Agente de IA do Nexo Study
           </p>
           <BlocosImpressao texto={paraImprimir.texto} />
         </div>

@@ -11,8 +11,8 @@ import {
   type Unsubscribe,
 } from "firebase/firestore";
 import { getFirebaseDb } from "@/lib/firebase/client";
-import { provaInputSchema, type ProvaInput } from "@/lib/validators/studyflow";
-import type { Prova } from "@/types/studyflow";
+import { provaInputSchema, type ProvaInput } from "@/lib/validators/dominio";
+import type { Prova } from "@/types/dominio";
 
 function provasRef(uid: string) {
   return collection(getFirebaseDb(), "usuarios", uid, "provas");

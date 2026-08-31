@@ -1,7 +1,7 @@
-# Study Flow — estado do projeto
+# Nexo Study — estado do projeto
 
 > **Para começar um chat novo:** leia este arquivo inteiro antes de tocar em
-> qualquer código. Ele é o retrato completo de 08/08/2026.
+> qualquer código. Ele é o retrato completo de 31/08/2026.
 > O `CONTEXTO.md` na raiz é o diário do projeto (histórico por data); este aqui é
 > o retrato do estado atual.
 
@@ -10,15 +10,16 @@
 ## 1. Antes de qualquer coisa
 
 ### ⚠️ Trabalhe na pasta certa
-Existem **duas** pastas na máquina do Pedro:
+Pasta atual do clone (após a formatação de 31/08/2026):
 
-| Pasta | O que é |
-|---|---|
-| `C:\Users\pedri\Downloads\study-flow-next-repo` | ✅ **O clone git de verdade.** Deploy sai daqui. |
-| `C:\Users\pedri\Downloads\study-flow-next-main` | ❌ Extração de ZIP. Não é git, não vai para o ar. |
+```
+C:\Users\pedri\OneDrive\Área de Trabalho\study-flow-next
+```
 
-Confirme com `git rev-parse --show-toplevel`. O `.env.local` já foi editado na
-pasta errada **quatro vezes**.
+As duas pastas antigas em `Downloads` (`-repo` e `-main`) **não existem mais** —
+a formatação limpou a confusão. Ainda assim, confirme com
+`git rev-parse --show-toplevel` antes de editar o `.env.local`: ele já foi
+editado na pasta errada **quatro vezes** no histórico do projeto.
 
 ### Regras do projeto
 - **Poucos commits.** Créditos do Netlify apertados; nada de push "pra testar".
@@ -32,9 +33,16 @@ pasta errada **quatro vezes**.
 ## 2. O produto
 
 SaaS brasileiro de organização de estudos. Fundador solo: Pedro Martins.
-Lançado em 08/07/2026. Produção: https://study-flow-app-449.netlify.app
+Lançado em 08/07/2026. Produção: https://nexo-study-app-449.netlify.app
 
-**Planos:** Base R$ 29,90 e Pro R$ 49,90 (Pro = Agente de IA), via **Kirvano**.
+**Chamava-se Study Flow até 31/08/2026.** O rebrand veio da seleção do projeto
+para a **PGTEC**, feira de tecnologia sustentável de Praia Grande, onde ele não
+pode ser anunciado como produto pago. O nome novo o liga ao futuro **ecossistema
+Nexo** e libera a monetização em paralelo. A identidade visual não mudou.
+
+**Planos:** Base R$ 29,90 e Pro R$ 49,90 (Pro = Agente de IA), via **Kirvano** —
+⚠️ com a troca pela **Cacto** em avaliação, já que o checkout nunca funcionou
+(ver `docs/PENDENCIAS.md`).
 
 **Telas:** Dashboard, Matérias, Atividades, Trabalhos, Provas, Caderno, Gráficos,
 Foco, Agente de IA, Configurações, Assinatura. Mais `/admin` (reservas),
@@ -215,7 +223,7 @@ variáveis precisam ir para o Netlify; **nada foi commitado ainda**.
 ## 10. Como rodar
 
 ```bash
-cd C:\Users\pedri\Downloads\study-flow-next-repo
+cd "C:\Users\pedri\OneDrive\Área de Trabalho\study-flow-next"
 npm install
 npm run dev
 ```

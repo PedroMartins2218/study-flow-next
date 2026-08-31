@@ -4,7 +4,7 @@ import { lerAssinatura } from "@/lib/data/assinaturaAdmin";
 import { temAcessoIa } from "@/lib/data/assinaturaCore";
 import { estornarCota, lerCota, reservarCota } from "@/lib/data/usoIaAdmin";
 import { ErroIa, extrairTarefas } from "@/lib/ia/gemini";
-import { extrairIaInputSchema } from "@/lib/validators/studyflow";
+import { extrairIaInputSchema } from "@/lib/validators/dominio";
 
 // Agente de IA (exclusivo do plano Pro).
 //
