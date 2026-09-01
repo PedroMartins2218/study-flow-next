@@ -34,6 +34,10 @@ export function assinaturaEstaAtiva(assinatura: Assinatura | null): boolean {
   if (!assinatura) return false;
   if (!STATUS_COM_ACESSO.includes(assinatura.status)) return false;
 
+  // Vitalício não expira: ignora `expiracao` de vez. Para revogar (reembolso,
+  // chargeback), o webhook grava `vitalicio: false` — não basta mexer na data.
+  if (assinatura.vitalicio) return true;
+
   if (!assinatura.expiracao) {
     // Sem data de expiração só vale para acesso concedido "em aberto"
     // (liberação manual pelo script). Inadimplente/cancelado sem data não

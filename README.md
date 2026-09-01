@@ -90,4 +90,4 @@ server-side estejam prontas — só então a versão antiga (`index.html`,
 Fase 1 em andamento: autenticação, rotas protegidas, layout base e CRUD de
 matérias/atividades por `uid`. Ver histórico de commits e tarefas para o
 que falta das fases 2 e 3 (trabalhos, provas, sessões de foco, gráficos,
-validação de assinatura server-side, integração Kirvano).
+validação de assinatura server-side, integração Cakto).

@@ -5,53 +5,41 @@
 
 ---
 
-## 🔴 Decisão em aberto: gateway de pagamento
+## 🟡 Configurar a Cakto (o código já está pronto)
 
-O checkout da Kirvano **nunca funcionou**. Os dois links respondem HTTP 200, mas
-o JavaScript da própria Kirvano quebra antes de desenhar a tela:
+A migração da Kirvano para a **Cakto** foi feita em 31/08/2026 e está testada
+localmente. O que falta é do lado do painel da Cakto e das variáveis:
 
-```
-Error during hydration for route /$offerUuid
-TypeError: Cannot read properties of undefined (reading 'name')
-  em pay.kirvano.com/assets/index-DKbiOUEa.js
-```
+- [ ] **Cadastrar o webhook** apontando para
+      `https://nexo-study-app-449.netlify.app/api/cakto/webhook`, assinando os
+      eventos: `purchase_approved`, `purchase_refused`, `refund`, `chargeback`,
+      `subscription_created`, `subscription_renewed`,
+      `subscription_renewal_refused`, `subscription_canceled`,
+      `subscription_paused`, `subscription_resumed`
+- [ ] **Copiar o `secret`** que a Cakto gera para o webhook →
+      `CAKTO_WEBHOOK_SECRET`. **Sem ele o endpoint recusa tudo** (falha fechado,
+      de propósito)
+- [ ] **Copiar os links de checkout** das duas ofertas →
+      `NEXT_PUBLIC_CAKTO_CHECKOUT_BASE_URL` e `..._PRO_URL`.
+      ⚠️ São `NEXT_PUBLIC_`: ficam embutidas no build, então **exigem rebuild**
+      depois de cadastradas no Netlify
+- [ ] **Copiar o id de cada oferta** (o valor que vem em `data.offer.id` no
+      payload) → `CAKTO_OFERTA_BASE_ID` e `CAKTO_OFERTA_PRO_ID`.
+      Sem eles, toda compra é tratada como Base — nunca liberamos Pro no escuro
+- [ ] **Cadastrar as 5 variáveis no Netlify** (`netlify env:set --force`, uma a
+      uma; o `env:import` corrompe aspas)
+- [ ] **Criar a oferta vitalícia na Cakto** (pagamento único, não recorrente),
+      copiar o id dela para `CAKTO_OFERTA_VITALICIO_ID` e guardar o link para
+      entregar a dedo. O código já está pronto; sem a variável, nenhuma compra
+      é tratada como vitalícia
+- [ ] **Disparar um evento de teste** pelo painel da Cakto e conferir o log
+- [ ] **Compra real de ponta a ponta** e reembolso depois: checkout →
+      `/obrigado` → cadastro com o mesmo e-mail → acesso liberado sozinho
 
-Acontece nas **duas ofertas do mesmo produto**, em navegador limpo — logo é
-configuração do produto, não da oferta. O erro lê um campo `.name`, o que combina
-com **"nome do vendedor"** em branco no cadastro.
-
-**Está em avaliação trocar a Kirvano pela Cacto** (decisão prevista para
-31/08/2026). O custo da troca é contido: a lógica de idempotência, a máquina de
-estados e as regras de acesso em `assinaturaCore.ts` são agnósticas ao gateway.
-Muda o schema Zod do payload em `kirvanoWebhook.ts`, a validação de token e os
-nomes das envs.
-
-- [ ] **Decidir: continuar na Kirvano ou migrar para a Cacto**
-- [ ] Se ficar na Kirvano: conferir campos obrigatórios do produto (nome do
-      vendedor, imagem, e-mail de suporte, página de vendas) e se ele está
-      publicado, não em rascunho. Persistindo, abrir chamado citando o erro
-      acima e o UUID `d495b817-0398-4bae-9274-c3b5af826253`
-- [ ] Preencher `KIRVANO_OFERTA_BASE_ID` e `KIRVANO_OFERTA_PRO_ID` — só saem do
-      payload de uma compra real (as 2 envs que faltam no Netlify)
-- [ ] Testar a compra ponta a ponta: checkout → `/obrigado` → cadastro com o
-      mesmo e-mail → acesso liberado sozinho. Testar reentrega (não pode
-      duplicar) e chargeback
-
-**Trava em cascata:** sem checkout não há compra de teste; sem compra de teste
-não temos o JSON do webhook; sem ele não dá para preencher os IDs de oferta nem
-confirmar qual cabeçalho carrega o token.
-
----
-
-## 🔴 Segurança: o webhook falha ABERTO
-
-`kirvanoWebhook.ts:266` devolve `true` quando o token não está configurado — o
-endpoint aceita qualquer origem. A variável já está no Netlify, então não há
-risco agora, mas isso é uma trava frágil.
-
-- [ ] **Apertar para falhar FECHADO** (`return false` sem token configurado)
-      assim que chegar o primeiro evento real. Vale para a Cacto também, se a
-      migração acontecer
+✅ O `.env.local` já está com os **valores reais** das 5 variáveis, conferidos
+em 31/08: os ids das ofertas batem com o final de cada link de checkout, o
+segredo tem formato UUID e os dois links abrem no navegador.
+`CAKTO_OFERTA_VITALICIO_ID` segue vazio — a oferta ainda não existe.
 
 ---
 
@@ -61,25 +49,59 @@ risco agora, mas isso é uma trava frágil.
       da landing mostra "Study Flow" na sidebar. Rodar local, logar, capturar de
       novo. Aproveitar para recortar o nome do usuário, que aparece no print
       atual
+- [ ] **Fazer o merge da branch `rebrand-nexo-study` na `main`** — enquanto isso
+      não acontece, a produção continua exibindo "Study Flow"
 - [ ] **Redesenhar `public/logo.png`** — tem o wordmark antigo embutido. Sem
       urgência: nenhum componente usa esse arquivo (só o `logo-mark.png`, que é
       só o monograma "ST" e continua válido)
 - [ ] **Testar arrastar e soltar no Kanban** (desktop) — não dá para verificar
       por automação
 - [ ] **Trocar a senha da conta admin** (foi digitada num chat)
+- [ ] **Apagar as contas de teste** quando os testes acabarem
+      (`testador1@example.com` e `testador2@example.com`), no Authentication e
+      nas coleções `assinaturas` e `usuarios`
+
+---
+
+## 🔴 Antes de abrir as vendas
+
+O plano completo de validação está no artefato **Blindagem do Nexo Study**
+(32 verificações em 8 fases). Os itens que bloqueiam o lançamento:
+
+- [ ] **Verificação de e-mail no cadastro** — o fluxo "pagar primeiro, criar
+      conta depois" casa compra e conta pelo e-mail. Sem comprovação, quem
+      souber o endereço de um comprador pode criar a conta antes dele e receber
+      o acesso. Confirmado que o Firebase aceita e-mail inventado sem verificar
+- [ ] **Varrer o histórico do git** atrás de segredo já commitado — o
+      repositório é público
+- [ ] **Rotacionar credenciais** antes de abrir ao público (conta de serviço do
+      Firebase, chave do Gemini, `ADMIN_SECRET`)
+- [ ] **LGPD** — o público inclui menores de idade. Política de privacidade,
+      termos de uso e caminho de exclusão de dados
+- [ ] **Rate limit** nas rotas de IA, de reserva e do admin
+- [ ] **`/api/admin/reservas` aceita a chave por query string** — vaza em log e
+      histórico. Deixar só o cabeçalho
 
 ---
 
 ## ✅ Concluído desde 08/08/2026
 
+- [x] **Migração da Kirvano para a Cakto** (31/08) — schema Zod do payload real,
+      mapa explícito dos 16 eventos, idempotência por `data.id` (chave que a
+      própria Cakto recomenda) e validação do `secret` com comparação de tempo
+      constante. Testado localmente: sem segredo → 401, segredo errado → 401,
+      compra aprovada → pendência gravada, reentrega → não duplica,
+      `pix_gerado` → não libera acesso, chargeback → remove a pendência,
+      evento desconhecido → ignorado sem quebrar
+- [x] **Webhook agora falha FECHADO** (31/08) — o da Kirvano devolvia `true`
+      quando a variável de token não estava configurada, ou seja, aceitava
+      qualquer origem. O da Cakto recusa
 - [x] **Rebrand para Nexo Study** (31/08) — código, metadados e prompt da IA
 - [x] **Site do Netlify renomeado** (31/08) — `study-flow-app-449` →
       `nexo-study-app-449`. Confirmado: a nova URL responde 200 e a antiga, 404
 - [x] **Publicadas as `firestore.rules`** (20/08) — conferido contra a API de
       Rules do Google: o ruleset em produção é idêntico ao arquivo local
 - [x] **`ADMIN_SECRET` preenchido** (20/08) — `/admin` destravado
-- [x] **16 das 18 variáveis no Netlify** (20/08) — faltam só as duas
-      `KIRVANO_OFERTA_*`, presas no checkout
 - [x] **`GEMINI_MODEL` validado** contra a API — `gemini-flash-lite-latest`
       está entre os 50 modelos visíveis à chave
 - [x] **Modo Foco testado no celular com a tela bloqueada** (31/08) — o
@@ -88,9 +110,10 @@ risco agora, mas isso é uma trava frágil.
 - [x] **Decisão da tipografia encerrada** (31/08) — mantida a pilha do sistema
       (Arial). A Geist era baixada e nunca usada; o carregamento foi removido,
       economizando duas requisições ao Google Fonts sem mudar um pixel
-- [x] **Pasta órfã `kirvano-landing/`** — não existe mais
 - [x] **`.env.local` reposto** (31/08) após a formatação da máquina, com o
       Firebase Admin e o Gemini validados por conexão real
+- [x] **Checkout quebrado da Kirvano** — resolvido pela migração; era o
+      JavaScript da própria Kirvano que quebrava antes de desenhar a tela
 
 ---
 
@@ -100,7 +123,6 @@ risco agora, mas isso é uma trava frágil.
 - **Anexos em PDF** no caderno (hoje só imagem; PDF exigiria Firebase Storage,
   que pede plano pago)
 - **E-mail transacional** (Resend): confirmação de compra e aviso de inadimplência
-- **Rate limit** em `/api/reserva` e nas rotas de IA
 - **Firebase App Check**
 - **Domínio próprio** — natural agora que a marca mudou; o `.netlify.app` é
   provisório

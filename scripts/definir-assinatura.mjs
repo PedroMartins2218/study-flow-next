@@ -7,9 +7,14 @@
 // Exemplos:
 //   npm run assinatura -- alguem@email.com ativo pro
 //   npm run assinatura -- alguem@email.com ativo base 2026-12-31
+//   npm run assinatura -- alguem@email.com ativo vitalicio
 //   npm run assinatura -- alguem@email.com inativo
 //
 // O `tier` é o que libera ou bloqueia o Agente de IA (só "pro" libera).
+//
+// `vitalicio` é um atalho: grava tier "pro" + a marca de acesso vitalício e
+// APAGA a expiração — sem data para vencer. É o caminho para liberar acesso
+// permanente a alguém sem cobrança.
 
 import { cert, initializeApp } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
@@ -18,7 +23,12 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 const [, , emailBruto, status, tier, expiracaoArg, planoArg] = process.argv;
 
 const STATUS_VALIDOS = ["ativo", "inativo", "trial", "inadimplente", "cancelado", "expirado"];
-const TIERS_VALIDOS = ["base", "pro"];
+const TIERS_VALIDOS = ["base", "pro", "vitalicio"];
+
+// "vitalicio" não é um tier de verdade: é tier "pro" mais a marca de acesso
+// permanente. Traduzimos aqui para o resto do script não precisar saber disso.
+const ehVitalicio = tier === "vitalicio";
+const tierReal = ehVitalicio ? "pro" : tier;
 
 function uso(mensagem) {
   console.error(`\n${mensagem}\n`);
@@ -78,14 +88,25 @@ async function main() {
   const usuario = await auth.getUserByEmail(email);
 
   const dados = { status, atualizadoEm: FieldValue.serverTimestamp() };
-  if (tier) dados.tier = tier;
+  if (tierReal) dados.tier = tierReal;
 
-  // Sem data informada, um acesso ativo vale por um mês.
-  if (expiracaoArg) dados.expiracao = expiracaoArg;
-  else if (status === "ativo") dados.expiracao = somarUmMes(hojeISO());
+  if (ehVitalicio) {
+    // Vitalício ignora a data. Apagar o campo é obrigatório: o `merge: true`
+    // preservaria uma expiração antiga, e o acesso venceria mesmo marcado
+    // como vitalício em outras leituras.
+    dados.vitalicio = true;
+    dados.expiracao = FieldValue.delete();
+  } else {
+    // Quem sai do vitalício precisa perder a marca explicitamente.
+    dados.vitalicio = false;
+    // Sem data informada, um acesso ativo vale por um mês.
+    if (expiracaoArg) dados.expiracao = expiracaoArg;
+    else if (status === "ativo") dados.expiracao = somarUmMes(hojeISO());
+  }
 
   if (planoArg) dados.plano = planoArg;
-  else if (tier) dados.plano = tier === "pro" ? "Nexo Study Pro" : "Nexo Study Base";
+  else if (ehVitalicio) dados.plano = "Nexo Study Vitalício";
+  else if (tierReal) dados.plano = tierReal === "pro" ? "Nexo Study Pro" : "Nexo Study Base";
 
   dados.fonte = "manual";
 
@@ -98,10 +119,13 @@ async function main() {
   console.log(`\nAssinatura de ${email} atualizada (uid ${usuario.uid}):`);
   for (const [k, v] of Object.entries(visivel)) console.log(`   ${k.padEnd(10)} ${v}`);
   console.log(
-    tier === "pro"
+    tierReal === "pro"
       ? "\nAgente de IA liberado para esta conta.\n"
       : "\nAgente de IA NÃO liberado (só o tier 'pro' libera).\n"
   );
+  if (ehVitalicio) {
+    console.log("Acesso VITALÍCIO: sem data de expiração, não precisa renovar.\n");
+  }
 }
 
 main().catch((erro) => {

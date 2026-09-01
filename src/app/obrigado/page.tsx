@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-// Destino do checkout da Kirvano. O ponto crítico desta tela é um só: a pessoa
+// Destino do checkout da Cakto. O ponto crítico desta tela é um só: a pessoa
 // precisa criar a conta com o MESMO e-mail que usou na compra, senão o webhook
 // (que só conhece o e-mail) não tem como ligar o pagamento à conta.
 export default async function ObrigadoPage({

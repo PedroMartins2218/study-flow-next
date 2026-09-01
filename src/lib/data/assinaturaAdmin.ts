@@ -9,6 +9,7 @@ export interface DadosAssinatura {
   tier?: TierAssinatura;
   plano?: string;
   expiracao?: string; // formato YYYY-MM-DD
+  vitalicio?: boolean;
 }
 
 function normalizarEmail(email: string): string {
@@ -31,6 +32,7 @@ export async function lerAssinatura(uid: string): Promise<Assinatura | null> {
     tier: data.tier,
     plano: data.plano,
     expiracao: data.expiracao,
+    vitalicio: data.vitalicio,
   };
 }
 
@@ -44,7 +46,7 @@ export async function gravarAssinatura(uid: string, dados: DadosAssinatura): Pro
     );
 }
 
-// A Kirvano identifica o comprador pelo e-mail; o uid do Firebase só existe
+// A Cakto identifica o comprador pelo e-mail; o uid do Firebase só existe
 // depois que a pessoa cria a conta. Retorna null (em vez de estourar) quando
 // ainda não existe conta — quem chama decide gravar uma pendência.
 export async function buscarUidPorEmail(email: string): Promise<string | null> {

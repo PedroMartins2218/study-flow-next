@@ -3,7 +3,7 @@ import type { TierAssinatura } from "@/types/dominio";
 // Fonte única de preço e copy dos planos. A landing e a tela de assinatura
 // leem daqui — mudou o preço, muda só neste arquivo.
 //
-// Os links de checkout são hospedados pela Kirvano (é lá que os dados de
+// Os links de checkout são hospedados pela Cakto (é lá que os dados de
 // pagamento trafegam; nada de cartão passa pelo nosso domínio).
 
 export interface Plano {
@@ -33,7 +33,7 @@ export const PLANO_BASE: Plano = {
   preco: "R$ 29,90",
   porDia: "Menos de R$ 1 por dia",
   resumo: "Todas as ferramentas de organização da sua rotina de estudos.",
-  checkoutUrl: process.env.NEXT_PUBLIC_KIRVANO_CHECKOUT_BASE_URL,
+  checkoutUrl: process.env.NEXT_PUBLIC_CAKTO_CHECKOUT_BASE_URL,
   beneficios: BENEFICIOS_BASE,
 };
 
@@ -43,7 +43,7 @@ export const PLANO_PRO: Plano = {
   preco: "R$ 49,90",
   porDia: "Menos de R$ 1,70 por dia",
   resumo: "Tudo do Base + o Agente de IA que monta sua rotina por você.",
-  checkoutUrl: process.env.NEXT_PUBLIC_KIRVANO_CHECKOUT_PRO_URL,
+  checkoutUrl: process.env.NEXT_PUBLIC_CAKTO_CHECKOUT_PRO_URL,
   destaque: "Mais completo",
   beneficios: [
     ...BENEFICIOS_BASE,

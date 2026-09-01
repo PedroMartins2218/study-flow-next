@@ -9,7 +9,8 @@
     "lint": "eslint",
     "migrar:legado": "node --env-file=.env.local scripts/migrar-dados-legado.mjs",
     "assinatura": "node --env-file=.env.local scripts/definir-assinatura.mjs",
-    "checar-env": "node --env-file=.env.local scripts/checar-env.mjs"
+    "checar-env": "node --env-file=.env.local scripts/checar-env.mjs",
+    "netlify-env": "node --env-file=.env.local scripts/netlify-env.mjs"
   },
   "dependencies": {
     "firebase": "^12.15.0",

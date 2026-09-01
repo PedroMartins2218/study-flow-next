@@ -61,34 +61,59 @@ export const reservaInputSchema = z.object({
 
 export type ReservaInput = z.infer<typeof reservaInputSchema>;
 
-// --- Kirvano ---------------------------------------------------------------
-// Modelado a partir da documentação oficial do webhook. Só `event` é
-// obrigatório: a doc não fecha os nomes dos subcampos de `products`/`plan`, e
-// um payload levemente diferente do esperado não pode derrubar a rota (erro
-// faz a Kirvano reenviar em loop). O que não está aqui é lido do corpo cru.
-export const kirvanoWebhookSchema = z.object({
+// --- Cakto (gateway de pagamento) ------------------------------------------
+// Schema do payload real do webhook, conforme a documentação da Cakto.
+// Tolerante de propósito: campo novo no payload não pode derrubar o endpoint
+// (erro faz a Cakto reenviar até 5 vezes). Só o que usamos é exigido.
+//
+// A Cakto NÃO assina o payload com HMAC nem manda header de assinatura: a
+// prova de origem é o campo `secret` no próprio corpo.
+export const caktoWebhookSchema = z.object({
+  secret: z.string().optional(),
   event: z.string().trim().min(1),
-  event_description: z.string().optional(),
-  checkout_id: z.string().optional(),
-  sale_id: z.string().optional(),
-  payment_method: z.string().optional(),
-  total_price: z.union([z.string(), z.number()]).optional(),
-  type: z.string().optional(), // ONE_TIME | RECURRING
-  status: z.string().optional(),
-  created_at: z.string().optional(),
-  customer: z
+  data: z
     .object({
-      name: z.string().optional(),
-      email: z.string().optional(),
-      document: z.string().optional(),
-      phone_number: z.string().optional(),
+      // `id` é a chave de deduplicação recomendada pela própria Cakto.
+      id: z.string().optional(),
+      refId: z.string().optional(),
+      status: z.string().optional(),
+      amount: z.union([z.string(), z.number()]).optional(),
+      baseAmount: z.union([z.string(), z.number()]).optional(),
+      paymentMethod: z.string().optional(),
+      installments: z.number().optional(),
+      paidAt: z.string().nullish(),
+      createdAt: z.string().optional(),
+      offer_type: z.string().optional(),
+      parent_order: z.string().nullish(),
+      customer: z
+        .object({
+          name: z.string().optional(),
+          email: z.string().optional(),
+          phone: z.string().optional(),
+          birthDate: z.string().optional(),
+        })
+        .optional(),
+      // `offer.id` é o que diz se a compra foi Base ou Pro.
+      offer: z
+        .object({
+          id: z.string().optional(),
+          name: z.string().optional(),
+          price: z.union([z.string(), z.number()]).optional(),
+        })
+        .optional(),
+      product: z
+        .object({
+          id: z.string().optional(),
+          short_id: z.string().optional(),
+          name: z.string().optional(),
+          type: z.string().optional(),
+        })
+        .optional(),
     })
     .optional(),
-  products: z.array(z.record(z.string(), z.unknown())).optional(),
-  plan: z.record(z.string(), z.unknown()).nullish(),
 });
 
-export type KirvanoWebhook = z.infer<typeof kirvanoWebhookSchema>;
+export type CaktoWebhook = z.infer<typeof caktoWebhookSchema>;
 
 // --- Agente de IA ----------------------------------------------------------
 // Contrato de saída do modelo. Nada é gravado sem passar por aqui: o JSON de

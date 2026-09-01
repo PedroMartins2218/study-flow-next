@@ -28,7 +28,7 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 /**
- * Puxa para a conta uma compra que a Kirvano já aprovou antes de o usuário se
+ * Puxa para a conta uma compra que a Cakto já aprovou antes de o usuário se
  * cadastrar (fluxo "pagar primeiro, criar conta depois"). Falha em silêncio de
  * propósito: não pode impedir o login, e a tela /assinatura tem o botão
  * "Já paguei" como plano B.

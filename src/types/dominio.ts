@@ -93,4 +93,14 @@ export interface Assinatura {
   tier?: TierAssinatura;
   plano?: string;
   expiracao?: string;
+  /**
+   * Acesso vitalício (compra única, sem renovação). Quando true, o acesso
+   * não olha `expiracao` — ver `assinaturaEstaAtiva`.
+   *
+   * É um campo explícito de propósito: antes, "acesso sem prazo" era
+   * representado pela AUSÊNCIA de `expiracao`, o que é fácil de quebrar sem
+   * perceber (qualquer escrita que preenchesse a data revogaria o vitalício
+   * em silêncio). Vitalício sempre vem com `tier: "pro"`.
+   */
+  vitalicio?: boolean;
 }

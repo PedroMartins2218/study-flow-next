@@ -40,7 +40,7 @@ para a **PGTEC**, feira de tecnologia sustentável de Praia Grande, onde ele nã
 pode ser anunciado como produto pago. O nome novo o liga ao futuro **ecossistema
 Nexo** e libera a monetização em paralelo. A identidade visual não mudou.
 
-**Planos:** Base R$ 29,90 e Pro R$ 49,90 (Pro = Agente de IA), via **Kirvano** —
+**Planos:** Base R$ 29,90 e Pro R$ 49,90 (Pro = Agente de IA), via **Cakto** —
 ⚠️ com a troca pela **Cacto** em avaliação, já que o checkout nunca funcionou
 (ver `docs/PENDENCIAS.md`).
 
@@ -75,7 +75,7 @@ src/
     auth/autenticarRequisicao.ts  verifica ID token nas rotas de API
     data/assinaturaCore.ts     ⭐ REGRAS DE ACESSO puras (sem Firebase)
     data/assinaturaAdmin.ts    leitura/escrita de assinatura (servidor)
-    data/kirvanoWebhook.ts     máquina de estados do pagamento
+    data/caktoWebhook.ts     máquina de estados do pagamento
     data/usoIaAdmin.ts         cota de IA (transacional)
     data/conversas.ts          conversas e mensagens do chat
     data/anexos.ts             anexos do caderno
@@ -89,7 +89,7 @@ src/
     obrigado/                  destino pós-checkout
     (auth)/login/              login e cadastro
     (dashboard)/               app protegido
-    api/kirvano/webhook/       recebe pagamento
+    api/cakto/webhook/       recebe pagamento
     api/assinatura/sincronizar/  libera compra pendente
     api/ia/chat|extrair|resumir/ rotas do Agente
   components/
@@ -105,14 +105,14 @@ src/
 ## 5. Monetização (como funciona)
 
 ```
-landing (#planos) → checkout Kirvano → SALE_APPROVED (webhook)
+landing (#planos) → checkout Cakto → SALE_APPROVED (webhook)
   → conta existe?  sim → grava assinaturas/{uid}
                    não → grava assinaturasPendentes/{email}
   → /obrigado → cria conta com o MESMO e-mail → /api/assinatura/sincronizar
   → acesso liberado
 ```
 
-O checkout é hospedado pela Kirvano de propósito: dados de cartão nunca passam
+O checkout é hospedado pela Cakto de propósito: dados de cartão nunca passam
 pelo nosso domínio (evita PCI-DSS).
 
 **Coleções no Firestore** (todas fechadas ao cliente — ver `firestore.rules`):
@@ -214,7 +214,7 @@ capa nas matérias, anexos de imagem no caderno, Modo Foco com blocos de
 
 Ver **`docs/PENDENCIAS.md`** — detalhado, com caixas para marcar.
 
-Resumo: o checkout da Kirvano está quebrado **do lado deles** e trava a
+Resumo: o checkout da Cakto está quebrado **do lado deles** e trava a
 finalização do pagamento; as regras do Firestore precisam ser publicadas; as
 variáveis precisam ir para o Netlify; **nada foi commitado ainda**.
 

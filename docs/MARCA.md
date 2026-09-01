@@ -177,7 +177,7 @@ produto — peça de marketing em outra fonte não vai casar com as telas.
 Argumentos de venda usados: sem fidelidade, cancela quando quiser, acesso pelo
 navegador sem instalar nada, e o comparativo por dia ("menos de R$ 1 por dia").
 
-Pagamento pela **Kirvano**. O Nexo Study não coleta nem armazena dados de
+Pagamento pela **Cakto**. O Nexo Study não coleta nem armazena dados de
 pagamento — e isso é dito na FAQ, porque é diferencial de confiança.
 
 ---

@@ -97,7 +97,7 @@ const FUNCOES = [
 const PERGUNTAS = [
   {
     q: "Preciso de cartão de crédito?",
-    a: "O pagamento é feito com segurança direto no checkout da Kirvano, que aceita cartão e outras formas de pagamento disponíveis por lá. O Nexo Study não coleta nem armazena dados de pagamento.",
+    a: "O pagamento é feito com segurança direto no checkout da Cakto, que aceita cartão e outras formas de pagamento disponíveis por lá. O Nexo Study não coleta nem armazena dados de pagamento.",
   },
   {
     q: "Qual a diferença entre o Base e o Pro?",
@@ -121,7 +121,7 @@ const PERGUNTAS = [
   },
   {
     q: "Em quanto tempo tenho acesso após assinar?",
-    a: "Você cria sua conta em segundos e, após a confirmação do pagamento no checkout da Kirvano, seu acesso é liberado automaticamente.",
+    a: "Você cria sua conta em segundos e, após a confirmação do pagamento no checkout da Cakto, seu acesso é liberado automaticamente.",
   },
 ];
 

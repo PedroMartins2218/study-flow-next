@@ -165,6 +165,7 @@ export default function AssinaturaPage() {
 
   const ativa = assinaturaEstaAtiva(assinatura);
   const ehTrial = assinatura?.status === "trial";
+  const ehVitalicio = Boolean(assinatura?.vitalicio);
   const nuncaTeve = assinatura === null;
   const planoAtual = planoDoTier(assinatura?.tier);
 
@@ -175,12 +176,26 @@ export default function AssinaturaPage() {
 
         <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200">
           <p className="text-sm font-medium text-emerald-700">
-            {ehTrial ? "Seu teste grátis está ativo." : "Sua assinatura está ativa."}
+            {ehVitalicio
+              ? "Seu acesso vitalício está ativo."
+              : ehTrial
+                ? "Seu teste grátis está ativo."
+                : "Sua assinatura está ativa."}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            Plano: {ehTrial ? "Teste grátis" : planoAtual?.nome ?? assinatura?.plano ?? "—"}
+            Plano:{" "}
+            {ehVitalicio
+              ? "Vitalício (acesso Pro, sem renovação)"
+              : ehTrial
+                ? "Teste grátis"
+                : planoAtual?.nome ?? assinatura?.plano ?? "—"}
           </p>
-          {assinatura?.expiracao && (
+          {ehVitalicio && (
+            <p className="mt-1 text-sm text-slate-500">
+              Sem data de expiração — você não precisa renovar nada.
+            </p>
+          )}
+          {!ehVitalicio && assinatura?.expiracao && (
             <p className="mt-1 text-sm text-slate-500">
               {assinatura.status === "cancelado"
                 ? "Acesso disponível até"

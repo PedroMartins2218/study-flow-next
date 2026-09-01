@@ -25,6 +25,7 @@ export function subscribeToAssinatura(
         tier: data.tier,
         plano: data.plano,
         expiracao: data.expiracao,
+        vitalicio: data.vitalicio,
       });
     },
     () => onChange(null)

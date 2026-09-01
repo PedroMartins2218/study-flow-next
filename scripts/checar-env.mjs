@@ -27,20 +27,25 @@ const GRUPOS = [
     ],
   },
   {
-    nome: "Kirvano — pagamento",
+    nome: "Cakto — pagamento",
     obrigatorio: true,
     chaves: [
-      "NEXT_PUBLIC_KIRVANO_CHECKOUT_BASE_URL",
-      "NEXT_PUBLIC_KIRVANO_CHECKOUT_PRO_URL",
-      "KIRVANO_OFERTA_BASE_ID",
-      "KIRVANO_OFERTA_PRO_ID",
-      "KIRVANO_WEBHOOK_TOKEN",
+      "NEXT_PUBLIC_CAKTO_CHECKOUT_BASE_URL",
+      "NEXT_PUBLIC_CAKTO_CHECKOUT_PRO_URL",
+      "CAKTO_OFERTA_BASE_ID",
+      "CAKTO_OFERTA_PRO_ID",
+      "CAKTO_WEBHOOK_SECRET",
     ],
   },
   {
     nome: "Agente de IA (plano Pro)",
     obrigatorio: true,
     chaves: ["GEMINI_API_KEY", "GEMINI_MODEL", "IA_LIMITE_PRO"],
+  },
+  {
+    nome: "Cakto — oferta vitalícia (opcional)",
+    obrigatorio: false,
+    chaves: ["CAKTO_OFERTA_VITALICIO_ID"],
   },
   {
     nome: "Painel administrativo",
@@ -81,7 +86,7 @@ function problemasDe(chave, valor) {
       avisos.push("não parece um link (precisa começar com https://)");
     }
   }
-  if (chave === "KIRVANO_WEBHOOK_TOKEN" && bruto && bruto.length < 16) {
+  if (chave === "CAKTO_WEBHOOK_SECRET" && bruto && bruto.length < 16) {
     avisos.push("token muito curto — gere um mais longo");
   }
   return avisos;
@@ -116,7 +121,7 @@ for (const grupo of GRUPOS) {
 }
 
 // Erro grave: segredo exposto ao navegador.
-const SEGREDOS = ["GEMINI_API_KEY", "KIRVANO_WEBHOOK_TOKEN", "FIREBASE_ADMIN_PRIVATE_KEY", "ADMIN_SECRET"];
+const SEGREDOS = ["GEMINI_API_KEY", "CAKTO_WEBHOOK_SECRET", "FIREBASE_ADMIN_PRIVATE_KEY", "ADMIN_SECRET"];
 const expostos = SEGREDOS.filter((c) => process.env[`NEXT_PUBLIC_${c}`]);
 if (expostos.length) {
   console.log("  PERIGO: estas variáveis secretas estão com prefixo NEXT_PUBLIC_ e");
