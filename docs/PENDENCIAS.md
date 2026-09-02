@@ -65,22 +65,23 @@ segredo tem formato UUID e os dois links abrem no navegador.
 
 ## 🔴 Antes de abrir as vendas
 
-O plano completo de validação está no artefato **Blindagem do Nexo Study**
-(32 verificações em 8 fases). Os itens que bloqueiam o lançamento:
+Validação de segurança **executada em 01/09/2026** — ver `CONTEXTO.md`.
+O que restou:
 
-- [ ] **Verificação de e-mail no cadastro** — o fluxo "pagar primeiro, criar
-      conta depois" casa compra e conta pelo e-mail. Sem comprovação, quem
-      souber o endereço de um comprador pode criar a conta antes dele e receber
-      o acesso. Confirmado que o Firebase aceita e-mail inventado sem verificar
-- [ ] **Varrer o histórico do git** atrás de segredo já commitado — o
-      repositório é público
-- [ ] **Rotacionar credenciais** antes de abrir ao público (conta de serviço do
-      Firebase, chave do Gemini, `ADMIN_SECRET`)
-- [ ] **LGPD** — o público inclui menores de idade. Política de privacidade,
-      termos de uso e caminho de exclusão de dados
-- [ ] **Rate limit** nas rotas de IA, de reserva e do admin
-- [ ] **`/api/admin/reservas` aceita a chave por query string** — vaza em log e
-      histórico. Deixar só o cabeçalho
+- [ ] **Rotacionar credenciais** na véspera do lançamento: chave da conta de
+      serviço do Firebase, chave do Gemini, `ADMIN_SECRET` e
+      `CAKTO_WEBHOOK_SECRET`. **Revogar as antigas**, não só gerar novas
+- [ ] **Revisão jurídica** de `/privacidade` e `/termos` — o texto reflete o
+      que o sistema faz, mas não é parecer de advogado
+- [ ] **Preencher o e-mail de suporte** citado nas duas páginas legais
+- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
+- [ ] **Limitador de requisições** — adiado por decisão: as rotas de IA já têm
+      login + plano + cota mensal, e a única rota pública foi removida.
+      Reavaliar quando houver volume real
+- [ ] **Apagar as contas de teste**: `testador1@example.com`,
+      `testador2@example.com` e `teste-verificacao-claude@studyflow.com`
+- [ ] **Apagar os 7 documentos legados** de `usuarios/{email}` depois de
+      confirmar que os usuários acessam normalmente (backup salvo fora do repo)
 
 ---
 

@@ -1,31 +1,14 @@
 import "server-only";
 
 import { getAdminFirestore } from "@/lib/firebase/admin";
-import { FieldValue } from "firebase-admin/firestore";
-import type { ReservaInput } from "@/lib/validators/dominio";
 import type { Reserva } from "@/types/dominio";
 
-// Grava um lead de reserva (pré-lançamento) na coleção `reservas`.
-// Escrita só acontece aqui, no servidor, via Admin SDK — a coleção fica
-// fechada para o cliente pelas regras do Firestore. Usa o e-mail como ID do
-// documento para deduplicar (mesma pessoa reservando de novo só atualiza).
-export async function registrarReserva(dados: ReservaInput): Promise<void> {
-  const id = dados.email.toLowerCase();
-  await getAdminFirestore()
-    .collection("reservas")
-    .doc(id)
-    .set(
-      {
-        nome: dados.nome,
-        email: id,
-        plano: dados.plano || null,
-        objetivo: dados.objetivo || null,
-        atualizadoEm: FieldValue.serverTimestamp(),
-        criadoEm: FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
-}
+// A coleção `reservas` guarda os leads captados antes do lançamento.
+// A rota pública de escrita foi removida em 01/09/2026: a landing não tinha
+// mais formulário de reserva, e um endpoint público que grava no banco sem
+// autenticação nem limite de frequência é superfície de ataque de graça.
+// A coleção continua sendo LIDA aqui (painel /admin) e pela elegibilidade do
+// trial em trialAdmin.ts.
 
 // Lista todas as reservas (leads) para o painel de admin. Server-only.
 export async function listarReservas(): Promise<Reserva[]> {

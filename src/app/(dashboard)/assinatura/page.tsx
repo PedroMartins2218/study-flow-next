@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuth } from "@/lib/auth/AuthProvider";
+import { useAuth, enviarVerificacaoEmail } from "@/lib/auth/AuthProvider";
 import { assinaturaEstaAtiva, subscribeToAssinatura } from "@/lib/data/assinatura";
 import { PLANOS, PLANO_PRO, planoDoTier, type Plano } from "@/lib/planos";
 import type { Assinatura } from "@/types/dominio";
@@ -131,13 +131,25 @@ export default function AssinaturaPage() {
     setAvisoSync("");
     setSincronizando(true);
     try {
-      const token = await user.getIdToken();
+      // `true` força um token novo: logo depois de confirmar o e-mail, o
+      // token em cache ainda diria que não foi confirmado.
+      const token = await user.getIdToken(true);
       const resp = await fetch("/api/assinatura/sincronizar", {
         method: "POST",
         headers: { Authorization: `Bearer ${token}` },
       });
       const dados = await resp.json();
       if (!resp.ok) {
+        // Compra encontrada, mas falta confirmar o e-mail: reenvia o link em
+        // vez de deixar a pessoa parada num aviso sem saída.
+        if (dados.precisaVerificarEmail) {
+          await enviarVerificacaoEmail(user);
+          setAvisoSync(
+            `Encontramos sua compra! Enviamos um link de confirmação para ${user.email}. ` +
+              "Clique nele e depois use este botão de novo para liberar o acesso."
+          );
+          return;
+        }
         setAvisoSync(dados.erro ?? "Não foi possível verificar sua compra.");
         return;
       }

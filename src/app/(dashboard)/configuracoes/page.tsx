@@ -37,6 +37,34 @@ export default function ConfiguracoesPage() {
   const [enviandoFoto, setEnviandoFoto] = useState(false);
   const [prefs, setPrefs] = useState<PrefsLembretes>(PREFS_PADRAO);
   const [permBloqueada, setPermBloqueada] = useState(false);
+  const [confirmandoExclusao, setConfirmandoExclusao] = useState(false);
+  const [textoConfirmacao, setTextoConfirmacao] = useState("");
+  const [excluindo, setExcluindo] = useState(false);
+
+  async function excluirConta() {
+    if (!user || textoConfirmacao !== "EXCLUIR") return;
+    setExcluindo(true);
+    try {
+      const token = await user.getIdToken();
+      const resp = await fetch("/api/conta/excluir", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!resp.ok) {
+        const dados = await resp.json().catch(() => ({}));
+        toast(dados.erro ?? "Não foi possível excluir sua conta.", "erro");
+        setExcluindo(false);
+        return;
+      }
+      // A conta já não existe no servidor. Recarregar leva ao login, e o
+      // estado local morre junto — mais confiável que tentar deslogar com um
+      // token que acabou de perder a validade.
+      window.location.href = "/";
+    } catch {
+      toast("Falha de conexão. Tente novamente.", "erro");
+      setExcluindo(false);
+    }
+  }
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -277,6 +305,72 @@ export default function ConfiguracoesPage() {
           </button>
         </div>
       </div>
+
+      {/* Direito garantido pela LGPD: a pessoa apaga os próprios dados sem
+          precisar pedir a ninguém. Fica por último e em vermelho porque é
+          irreversível. */}
+      <div className="mt-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-red-200">
+        <h2 className="text-sm font-semibold text-red-700">Excluir minha conta</h2>
+        <p className="mt-1 text-xs text-slate-500">
+          Apaga sua conta e <strong>todo</strong> o seu conteúdo — matérias,
+          atividades, trabalhos, provas, caderno, sessões de foco e conversas
+          com o Agente de IA. É imediato e não dá para recuperar.
+        </p>
+        <p className="mt-2 text-xs text-slate-500">
+          Se você tem assinatura ativa, cancele antes pela Cakto para não ser
+          cobrado de novo.
+        </p>
+
+        {!confirmandoExclusao ? (
+          <button
+            onClick={() => setConfirmandoExclusao(true)}
+            className="mt-4 rounded-lg border border-red-300 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50"
+          >
+            Excluir minha conta
+          </button>
+        ) : (
+          <div className="mt-4 rounded-lg bg-red-50 p-4">
+            <p className="text-sm text-red-900">
+              Para confirmar, digite <strong>EXCLUIR</strong> abaixo.
+            </p>
+            <input
+              value={textoConfirmacao}
+              onChange={(e) => setTextoConfirmacao(e.target.value)}
+              placeholder="EXCLUIR"
+              className="mt-3 w-full rounded-lg border border-red-300 bg-white px-3 py-2 text-sm outline-none focus:border-red-500 sm:max-w-xs"
+            />
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                onClick={excluirConta}
+                disabled={textoConfirmacao !== "EXCLUIR" || excluindo}
+                className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
+              >
+                {excluindo ? "Excluindo..." : "Confirmar exclusão"}
+              </button>
+              <button
+                onClick={() => {
+                  setConfirmandoExclusao(false);
+                  setTextoConfirmacao("");
+                }}
+                disabled={excluindo}
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-white disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <p className="mt-6 text-center text-xs text-slate-400">
+        <a href="/privacidade" className="hover:text-slate-600">
+          Política de Privacidade
+        </a>
+        {" · "}
+        <a href="/termos" className="hover:text-slate-600">
+          Termos de Uso
+        </a>
+      </p>
     </div>
   );
 }

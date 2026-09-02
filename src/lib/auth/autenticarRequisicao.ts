@@ -5,6 +5,13 @@ import { getAdminAuth } from "@/lib/firebase/admin";
 export interface UsuarioAutenticado {
   uid: string;
   email: string | null;
+  /**
+   * O Firebase confirmou que este e-mail é mesmo da pessoa (ela clicou no
+   * link enviado). Criar conta NÃO exige isso — qualquer um se cadastra com
+   * qualquer endereço —, então nenhuma decisão que envolva dinheiro pode
+   * confiar só no `email`.
+   */
+  emailVerificado: boolean;
 }
 
 /**
@@ -22,7 +29,11 @@ export async function autenticarRequisicao(
 
   try {
     const decodificado = await getAdminAuth().verifyIdToken(token);
-    return { uid: decodificado.uid, email: decodificado.email ?? null };
+    return {
+      uid: decodificado.uid,
+      email: decodificado.email ?? null,
+      emailVerificado: decodificado.email_verified === true,
+    };
   } catch (erro) {
     console.error("[auth] ID token inválido:", erro);
     return null;

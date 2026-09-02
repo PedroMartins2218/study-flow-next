@@ -96,9 +96,26 @@ export async function aplicarPendenteSeExistir(uid: string, email: string): Prom
     tier: data.tier,
     plano: data.plano,
     expiracao: data.expiracao,
+    // Sem isto, uma compra VITALÍCIA feita antes de a conta existir perderia
+    // o "para sempre" justamente na hora de virar assinatura de verdade.
+    vitalicio: data.vitalicio,
   });
   await ref.delete();
   return true;
+}
+
+/**
+ * Existe compra aguardando este e-mail? Consulta sem aplicar nada.
+ *
+ * Serve para decidir se vale exigir e-mail confirmado: só faz sentido pedir a
+ * confirmação quando há mesmo uma compra em jogo.
+ */
+export async function existePendente(email: string): Promise<boolean> {
+  const snap = await getAdminFirestore()
+    .collection("assinaturasPendentes")
+    .doc(normalizarEmail(email))
+    .get();
+  return snap.exists;
 }
 
 /**

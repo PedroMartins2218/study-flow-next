@@ -3,13 +3,19 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Aceita dois formatos de "dono do documento" durante a transição:
-    // - uid do Firebase Auth (novo app, nexo-study)
-    // - e-mail do usuário (app antigo, dashboard.html, que usa email como ID)
-    // Um uid nunca é igual a um e-mail, então não há risco de colisão.
+    // Dono do documento = uid do Firebase Auth, e nada mais.
+    //
+    // Até 01/09/2026 esta função também aceitava `request.auth.token.email`,
+    // herança do app antigo (dashboard.html), que usava o e-mail como ID do
+    // documento. Era uma trava frágil: o Firebase permite criar conta com
+    // qualquer e-mail SEM verificar se é seu, então bastava registrar o
+    // endereço de alguém para virar dono do documento dele.
+    //
+    // Os 7 usuários legados foram migrados para o modelo por uid antes desta
+    // mudança (`scripts/migrar-dados-legado.mjs`), com backup dos documentos
+    // originais. O uid é atribuído pelo Firebase e ninguém escolhe o seu.
     function isOwnerDoc(docId) {
-      return request.auth != null &&
-        (request.auth.uid == docId || request.auth.token.email == docId);
+      return request.auth != null && request.auth.uid == docId;
     }
 
     // Perfil e dados do usuário: cada usuário só acessa o próprio documento

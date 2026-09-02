@@ -11,6 +11,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   signOut,
   type User,
 } from "firebase/auth";
@@ -35,13 +36,36 @@ const AuthContext = createContext<AuthContextValue | null>(null);
  */
 async function sincronizarAssinatura(usuario: User) {
   try {
-    const token = await usuario.getIdToken();
-    await fetch("/api/assinatura/sincronizar", {
+    // `true` força um token novo: logo após confirmar o e-mail, o token em
+    // cache ainda diz email_verified=false e o servidor recusaria de novo.
+    const token = await usuario.getIdToken(true);
+    const resp = await fetch("/api/assinatura/sincronizar", {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
     });
+
+    // Há compra esperando, mas o e-mail ainda não foi confirmado: manda o
+    // link automaticamente, para a pessoa não ficar travada sem entender.
+    if (resp.status === 403) {
+      const dados = await resp.json().catch(() => ({}));
+      if (dados?.precisaVerificarEmail) {
+        await enviarVerificacaoEmail(usuario);
+      }
+    }
   } catch (erro) {
     console.error("Falha ao sincronizar assinatura:", erro);
+  }
+}
+
+/**
+ * Envia (ou reenvia) o e-mail de confirmação. O Firebase limita a frequência
+ * por conta própria, então chamar demais devolve erro em vez de spammar.
+ */
+export async function enviarVerificacaoEmail(usuario: User): Promise<void> {
+  try {
+    await sendEmailVerification(usuario);
+  } catch (erro) {
+    console.error("Falha ao enviar e-mail de verificação:", erro);
   }
 }
 

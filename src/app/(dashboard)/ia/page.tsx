@@ -549,8 +549,18 @@ export default function AgenteIaPage() {
             </svg>
           </button>
         </div>
+        {/* Transparência exigida pela LGPD: a pessoa precisa saber que o texto
+            dela sai daqui e vai para um serviço de terceiro. */}
         <p className="mt-1.5 text-center text-[11px] text-slate-400">
           O agente pode errar. Confira datas e informações importantes.
+          <br className="sm:hidden" />
+          <span className="sm:ml-1">
+            Suas mensagens são enviadas ao Gemini (Google) para gerar a resposta —{" "}
+            <a href="/privacidade" className="underline hover:text-slate-600">
+              saiba mais
+            </a>
+            . Não envie dados sensíveis.
+          </span>
         </p>
       </div>
 

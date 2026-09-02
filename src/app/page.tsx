@@ -473,6 +473,19 @@ export default function LandingPage() {
             Nexo Study — organização e acompanhamento de estudos. O Nexo Study não
             promete aprovação; ele te dá estrutura, clareza e constância.
           </p>
+          <p className="text-xs text-slate-500">
+            <Link href="/privacidade" className="hover:text-slate-800">
+              Política de Privacidade
+            </Link>
+            <span className="text-slate-300"> · </span>
+            <Link href="/termos" className="hover:text-slate-800">
+              Termos de Uso
+            </Link>
+          </p>
+          <p className="max-w-xl text-xs text-slate-400">
+            Menores de 18 anos devem usar o serviço com o consentimento dos pais
+            ou responsáveis.
+          </p>
         </div>
       </footer>
     </div>
