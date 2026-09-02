@@ -1,128 +1,127 @@
 # Retomar aqui
 
 > **Leia este arquivo antes de qualquer outro.** Ele diz onde o trabalho parou.
-> Última atualização: **01/09/2026**.
+> Última varredura completa: **01/09/2026, fim do dia**.
 >
-> Histórico detalhado fica no `CONTEXTO.md`. Lista completa de pendências, no
-> `docs/PENDENCIAS.md`. Este aqui é só o "por onde continuar".
+> Histórico por data fica no `CONTEXTO.md`. Este aqui é o "por onde continuar".
 
 ---
 
-## O estado, em uma tabela
+## O sistema está NO AR e funcionando
 
-| | Código (branch `rebrand-nexo-study`) | Produção (`main`) |
-|---|---|---|
-| Marca Nexo Study | pronto | ainda "Study Flow" |
-| Gateway Cakto | pronto e testado | rota não existe (404) |
-| Plano vitalício | pronto e testado | não existe |
-| Correções de segurança | prontas e testadas | não existem |
-| Páginas legais (LGPD) | prontas | não existem |
-| Exclusão de conta | pronta e testada | não existe |
+`main` em `6615ea2`, deploy do Netlify confirmado. Verificado por requisição
+real e por navegador automatizado logando na produção:
 
-**A produção roda o commit `a12e068`, de 20/08.** Nada do que foi feito em 31/08
-e 01/09 está no ar. Isso é intencional — falta o passo do Netlify e o merge.
-
-**Exceção importante:** as `firestore.rules` **já estão publicadas** em produção
-(01/09). Regras não passam por deploy do Netlify, vão direto para o Firebase.
-
----
-
-## Segurança — onde paramos
-
-A validação foi **executada em 01/09/2026**. O roteiro completo continua no
-artefato **Blindagem do Nexo Study** (32 verificações).
-
-### Resolvido e provado
-
-| Item | O que era |
+| Verificação | Resultado |
 |---|---|
-| **A1, A3, A4, A5** | Isolamento entre contas, assinatura read-only, ledger fechado, regras publicadas conferidas |
-| **A2** | Regra aceitava e-mail não verificado como dono. Migrados 7 usuários, regra reduzida a só `uid`, publicada. Ataque controlado devolve 403 |
-| **B2** | Compra podia ser reivindicada por quem registrasse o e-mail primeiro. Agora exige e-mail confirmado — só quando há compra pendente |
-| **C1, C2** | Rotas exigem login; plano Pro travado no servidor |
-| **C3** | `POST /api/reserva` removida (única rota pública sem autenticação) |
-| **D1, D4** | Chave do admin não é mais aceita pela URL; comparação de tempo constante |
-| **E1, E2** | Nenhum segredo no histórico do git nem no bundle do navegador |
-| **F1** | Sem caminho de injeção de HTML |
-| **G1** | `/privacidade`, `/termos`, exclusão de conta e aviso do Gemini |
-
-### Falta — e depende do Pedro
-
-- [ ] **Rotacionar credenciais na véspera do lançamento**: chave da conta de
-      serviço do Firebase, chave do Gemini, `ADMIN_SECRET` e
-      `CAKTO_WEBHOOK_SECRET`. **Revogar as antigas**, não só gerar novas
-- [ ] **Revisão jurídica** de `/privacidade` e `/termos` — o texto reflete o
-      sistema, mas não é parecer de advogado, e o tema de menores é sensível
-- [ ] **Preencher o e-mail de suporte** citado nas duas páginas legais
-- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
-- [ ] **Apagar as contas de teste**: `testador1@example.com`,
-      `testador2@example.com`, `teste-verificacao-claude@studyflow.com`
-- [ ] **Apagar os 7 documentos legados** `usuarios/{email}` depois de confirmar
-      que aqueles usuários acessam normalmente
-      (backup em `../backup-usuarios-legado-2026-09-01.json`, fora do repo)
-- [ ] **Limitador de requisições** — adiado por decisão consciente. Reavaliar
-      quando houver volume real
+| Login em produção | funciona |
+| As 10 telas do app | todas carregam, títulos corretos |
+| Erros de JavaScript | **nenhum** |
+| Dashboard | sem NaN, gráfico com as 7 barras |
+| Marca na landing | 44× "Nexo Study", 0× "Study Flow" |
+| `/privacidade`, `/termos` | no ar |
+| `/api/cakto/webhook` | existe; recusa sem segredo e com segredo errado (401) |
+| `/api/reserva` (removida) | 404 |
+| Regras do Firestore | publicadas |
+| Variáveis no Netlify | 19 cadastradas |
 
 ---
 
-## Próximos passos, na ordem
+## 🔴 Bloqueia vender para estranhos
 
-### 1. ~~Variáveis no Netlify~~ — FEITO em 01/09/2026
+### 1. Não existe e-mail de suporte — mas as páginas legais prometem um
 
-As 19 variáveis estão cadastradas e as 5 órfãs da Kirvano foram removidas.
-O `CAKTO_WEBHOOK_SECRET` ficou com escopo Builds/Functions/Runtime e valor
-em Production — confirmado, é o que o webhook precisa.
-⚠️ As duas `NEXT_PUBLIC_CAKTO_CHECKOUT_*` só passam a valer no próximo build.
+**Achado na varredura de 01/09.** `/privacidade` e `/termos` mandam o usuário
+escrever "para o e-mail de suporte informado no rodapé do site". Varri o
+projeto inteiro: **não existe nenhum e-mail de contato em lugar nenhum.**
 
-### 2. ~~Entrega do acesso ao comprador~~ — RESOLVIDO sem código
+Quem quiser exercer os direitos da LGPD — acesso, correção, exclusão — não tem
+para onde escrever. É promessa quebrada e exposição legal.
 
-A Cakto entrega sozinha. No cadastro do produto, na etapa de entrega, ela
-oferece **"Acesso por e-mail"**: o cliente recebe o link automaticamente no
-e-mail "Pagamento Confirmado", disparado logo após a aprovação. Pedro
-configurou em 01/09.
+- [ ] Definir um endereço de suporte
+- [ ] Colocar no rodapé da landing e nas duas páginas legais
 
-Assim, quem fechar a aba depois de pagar recebe o link mesmo assim — que era
-o buraco. Continua valendo confirmar, no primeiro evento real, **se o webhook
-dispara normalmente nesse modo de entrega** (o esperado é que sim: webhooks
-são configurados numa seção separada do painel).
+### 2. O webhook nunca recebeu um evento real
 
-### 3. ~~Recapturar o print do hero~~ — FEITO em 01/09/2026
+O endereço está no ar e recusa corretamente quem não tem o segredo, mas nenhum
+evento verdadeiro da Cakto passou por ele.
 
-Refeito com Puppeteer, com a marca certa, o e-mail da conta escondido e o
-painel "Hoje" com conteúdo. A captura revelou dois bugs reais, já corrigidos:
-o gráfico "Foco · últimos 7 dias" nunca renderizou (altura em porcentagem
-sobre pai sem altura), e o "Foco hoje" exibia "NaNh NaNmin".
-
-### 4. Testar o webhook de ponta a ponta — **é o próximo passo**
-
-O merge foi feito e o endereço está no ar. Falta:
 - [ ] Conferir na Cakto que o webhook aponta para
-      `https://nexo-study-app-449.netlify.app/api/cakto/webhook` e que os 10
-      eventos estão marcados. **Não criar um segundo webhook** — isso geraria
-      um segredo novo e quebraria o que está no Netlify
-- [ ] Disparar o evento de teste pelo painel e conferir o resultado
-- [ ] Compra real de ponta a ponta, com reembolso depois
+      `https://nexo-study-app-449.netlify.app/api/cakto/webhook` com os 10
+      eventos marcados. **Não criar um segundo** — geraria um segredo novo e
+      quebraria o que está no Netlify
+- [ ] Disparar o evento de teste pelo painel
+- [ ] **Confirmar que o webhook dispara junto com o modo de entrega
+      "Acesso por e-mail"** que foi configurado. É a única incógnita real
+- [ ] Compra de verdade, ponta a ponta, com reembolso depois
 
-### 5. Avisar a testadora
+### 3. Revisão jurídica
 
-O link antigo (`study-flow-app-449`) responde 404 desde o rebrand.
+Os textos de `/privacidade` e `/termos` refletem o que o sistema faz, mas não
+são parecer de advogado — e o público inclui **menores de idade**, que é
+justamente onde a LGPD aperta.
+
+### 4. Rotacionar credenciais
+
+Chave da conta de serviço do Firebase, chave do Gemini, `ADMIN_SECRET` e
+`CAKTO_WEBHOOK_SECRET`. **Revogar as antigas**, não só gerar novas.
 
 ---
 
-## Contas de teste ativas
+## 🟡 Qualidade e higiene
+
+- [ ] **A imagem OG ainda diz "Acesso de fundador · pré-lançamento"**
+      (`opengraph-image.tsx:67`). É o que aparece quando alguém compartilha o
+      link no WhatsApp. Trocar pela copy dos planos
+- [ ] **5 contas descartáveis no Auth**: `testador1@example.com`,
+      `testador2@example.com`, `teste-verificacao-claude@studyflow.com`,
+      `yopan@gmail.com`, `henrique@gmail.com`.
+      ⚠️ `testador1` é a conta usada no print do hero — só apagar depois de
+      não precisar mais recapturar
+- [ ] **7 documentos legados** `usuarios/{email}` ainda no Firestore. Já são
+      inalcançáveis pela regra nova; apagar depois de confirmar que aqueles
+      usuários acessam normalmente
+      (backup em `../backup-usuarios-legado-2026-09-01.json`, fora do repo)
+- [ ] **`public/logo.png`** tem o wordmark "Study Flow" embutido. Nenhum
+      componente usa, mas não serve para material de marketing
+- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
+- [ ] **Arrastar e soltar do Kanban** no desktop — nunca testado
+- [ ] **`.gitattributes`** para normalizar fim de linha entre as duas máquinas.
+      Já causou problema real: edições por script com `\n` não casam com os
+      arquivos em CRLF e falham em silêncio
+
+---
+
+## 🟢 Decisões em aberto
+
+- **Trial de fundador:** ainda ativo, com **6 e-mails** elegíveis na coleção
+  `reservas`. Manter, encerrar ou reaproveitar como cortesia?
+- **Limitador de requisições:** adiado por decisão consciente — as rotas de IA
+  já têm login + plano + cota mensal, e a única rota pública foi removida.
+  Reavaliar quando houver volume
+- **Identidade visual do ecossistema Nexo (preto e branco):** adiada para
+  depois do lançamento
+- **Domínio próprio:** o `.netlify.app` é provisório
+- **Firebase App Check**, **e-mail transacional próprio (Resend)**,
+  **anexos em PDF**, **toggle lista/quadro**, **notificações com app fechado**
+
+---
+
+## Contas de teste
 
 | E-mail | Senha | Plano |
 |---|---|---|
 | `testador1@example.com` | `NexoTeste1#2026` | Pro até 30/09/2026 |
 | `testador2@example.com` | `NexoTeste2#2026` | Pro até 30/09/2026 |
 
-Servem também para repetir o teste A1 (isolamento entre contas).
+`testador1` tem dados de demonstração e é a conta do print do hero.
 
 ---
 
-## Pontas soltas menores
+## Sugestão de ordem para amanhã
 
-- Copy da imagem OG ainda diz "pré-lançamento" (aparece no preview do WhatsApp)
-- `public/logo.png` tem o wordmark antigo embutido (nenhum componente usa)
-- `.gitattributes` para normalizar fim de linha entre as duas máquinas
-- Arrastar e soltar do Kanban no desktop nunca foi testado por automação
+1. **E-mail de suporte** — é rápido e destrava a conformidade legal
+2. **Teste do webhook** com a Cakto, de ponta a ponta
+3. **Copy da imagem OG** — antes de divulgar o link para qualquer pessoa
+4. **Avisar a testadora** do endereço novo (o antigo responde 404)
+5. Depois: limpeza das contas de teste e dos documentos legados
