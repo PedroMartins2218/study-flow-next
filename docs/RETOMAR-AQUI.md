@@ -74,30 +74,34 @@ O `CAKTO_WEBHOOK_SECRET` ficou com escopo Builds/Functions/Runtime e valor
 em Production — confirmado, é o que o webhook precisa.
 ⚠️ As duas `NEXT_PUBLIC_CAKTO_CHECKOUT_*` só passam a valer no próximo build.
 
-### 2. Entrega do acesso ao comprador — **decisão pendente**
+### 2. ~~Entrega do acesso ao comprador~~ — RESOLVIDO sem código
 
-O buraco mais importante que resta. Hoje o comprador paga, é levado a
-`/obrigado` e instruído a criar conta com o mesmo e-mail. **Se fechar a aba, não
-recebe nada** — nenhum e-mail nosso é enviado.
+A Cakto entrega sozinha. No cadastro do produto, na etapa de entrega, ela
+oferece **"Acesso por e-mail"**: o cliente recebe o link automaticamente no
+e-mail "Pagamento Confirmado", disparado logo após a aprovação. Pedro
+configurou em 01/09.
 
-Investigar nesta ordem, parando no primeiro que resolver:
-1. A Cakto redireciona para uma URL nossa? Apontar para
-   `https://nexo-study-app-449.netlify.app/obrigado`. E ela passa o e-mail da
-   compra na URL? Se passar, dá para pré-preencher o cadastro
-2. A Cakto manda e-mail de confirmação e dá para personalizar? Se couber o link
-   e a instrução do "use o mesmo e-mail", resolve sem código
-3. Se não: e-mail próprio (Resend) disparado no `purchase_approved`
+Assim, quem fechar a aba depois de pagar recebe o link mesmo assim — que era
+o buraco. Continua valendo confirmar, no primeiro evento real, **se o webhook
+dispara normalmente nesse modo de entrega** (o esperado é que sim: webhooks
+são configurados numa seção separada do painel).
 
-### 3. Recapturar o print do hero
+### 3. ~~Recapturar o print do hero~~ — FEITO em 01/09/2026
 
-`public/marketing/dashboard-preview.png` ainda mostra "Study Flow" na sidebar.
-Rodar local, logar, capturar de novo, recortando o nome do usuário.
+Refeito com Puppeteer, com a marca certa, o e-mail da conta escondido e o
+painel "Hoje" com conteúdo. A captura revelou dois bugs reais, já corrigidos:
+o gráfico "Foco · últimos 7 dias" nunca renderizou (altura em porcentagem
+sobre pai sem altura), e o "Foco hoje" exibia "NaNh NaNmin".
 
-### 4. Merge na `main` e webhook
+### 4. Testar o webhook de ponta a ponta — **é o próximo passo**
 
-Uma única build do Netlify (⚠️ créditos acima de 75%). Depois do deploy,
-cadastrar o webhook na Cakto apontando para `/api/cakto/webhook` e disparar um
-evento de teste — antes do merge essa rota não existe.
+O merge foi feito e o endereço está no ar. Falta:
+- [ ] Conferir na Cakto que o webhook aponta para
+      `https://nexo-study-app-449.netlify.app/api/cakto/webhook` e que os 10
+      eventos estão marcados. **Não criar um segundo webhook** — isso geraria
+      um segredo novo e quebraria o que está no Netlify
+- [ ] Disparar o evento de teste pelo painel e conferir o resultado
+- [ ] Compra real de ponta a ponta, com reembolso depois
 
 ### 5. Avisar a testadora
 
