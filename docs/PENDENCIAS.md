@@ -26,8 +26,6 @@ localmente. O que falta é do lado do painel da Cakto e das variáveis:
 - [ ] **Copiar o id de cada oferta** (o valor que vem em `data.offer.id` no
       payload) → `CAKTO_OFERTA_BASE_ID` e `CAKTO_OFERTA_PRO_ID`.
       Sem eles, toda compra é tratada como Base — nunca liberamos Pro no escuro
-- [ ] **Cadastrar as 5 variáveis no Netlify** (`netlify env:set --force`, uma a
-      uma; o `env:import` corrompe aspas)
 - [ ] **Criar a oferta vitalícia na Cakto** (pagamento único, não recorrente),
       copiar o id dela para `CAKTO_OFERTA_VITALICIO_ID` e guardar o link para
       entregar a dedo. O código já está pronto; sem a variável, nenhuma compra
@@ -97,6 +95,8 @@ O que restou:
 - [x] **Webhook agora falha FECHADO** (31/08) — o da Kirvano devolvia `true`
       quando a variável de token não estava configurada, ou seja, aceitava
       qualquer origem. O da Cakto recusa
+- [x] **Variáveis no Netlify** (01/09) — 19 cadastradas, 5 órfãs da Kirvano
+      removidas. `CAKTO_WEBHOOK_SECRET` com valor em Production
 - [x] **Rebrand para Nexo Study** (31/08) — código, metadados e prompt da IA
 - [x] **Site do Netlify renomeado** (31/08) — `study-flow-app-449` →
       `nexo-study-app-449`. Confirmado: a nova URL responde 200 e a antiga, 404

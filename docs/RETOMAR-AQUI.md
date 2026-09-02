@@ -67,12 +67,12 @@ artefato **Blindagem do Nexo Study** (32 verificações).
 
 ## Próximos passos, na ordem
 
-### 1. Variáveis no Netlify
+### 1. ~~Variáveis no Netlify~~ — FEITO em 01/09/2026
 
-Apagar as 5 órfãs da Kirvano e cadastrar as 6 da Cakto.
-Rode `npm run netlify-env` para os comandos já preenchidos, ou faça pelo painel.
-⚠️ As duas `NEXT_PUBLIC_CAKTO_CHECKOUT_*` são embutidas no build — exigem
-rebuild depois de cadastradas.
+As 19 variáveis estão cadastradas e as 5 órfãs da Kirvano foram removidas.
+O `CAKTO_WEBHOOK_SECRET` ficou com escopo Builds/Functions/Runtime e valor
+em Production — confirmado, é o que o webhook precisa.
+⚠️ As duas `NEXT_PUBLIC_CAKTO_CHECKOUT_*` só passam a valer no próximo build.
 
 ### 2. Entrega do acesso ao comprador — **decisão pendente**
 
