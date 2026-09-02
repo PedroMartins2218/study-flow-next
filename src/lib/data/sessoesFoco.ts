@@ -31,7 +31,11 @@ export function subscribeToSessoes(
         return {
           id: d.id,
           materia: data.materia,
-          mins: data.mins,
+          // Documento malformado (campo ausente, texto, null) não pode virar
+          // NaN: o "Foco hoje" do dashboard soma isto e renderizaria
+          // "NaNh NaNmin" na tela principal. Zero é errado, mas legível —
+          // NaN contamina toda soma que encostar nele.
+          mins: Number.isFinite(data.mins) ? (data.mins as number) : 0,
           data: data.data,
           hora: data.hora,
         } satisfies SessaoFoco;

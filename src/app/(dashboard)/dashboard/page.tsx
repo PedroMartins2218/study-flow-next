@@ -272,7 +272,14 @@ export default function DashboardPage() {
             <h2 className="text-sm font-semibold text-slate-900">Foco · últimos 7 dias</h2>
             <div className="mt-4 flex h-20 items-end gap-2">
               {focoSeteDias.map((d, idx) => (
-                <div key={d.chave} className="flex flex-1 flex-col items-center gap-1">
+                // `h-full` e `justify-end` são obrigatórios: a barra usa altura
+                // em porcentagem, e porcentagem só resolve contra um pai de
+                // altura definida. Sem isto a coluna media 0 e o gráfico ficava
+                // invisível — o estilo era aplicado, mas rendia 0 pixel.
+                <div
+                  key={d.chave}
+                  className="flex h-full flex-1 flex-col items-center justify-end gap-1"
+                >
                   <div
                     className={`w-full rounded-t ${idx === 6 ? "bg-blue-300" : "bg-blue-600"}`}
                     style={{ height: `${Math.max(4, (d.mins / focoMax) * 100)}%` }}
