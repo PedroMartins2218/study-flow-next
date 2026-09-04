@@ -116,6 +116,9 @@ async function main() {
   // então fica de fora do que imprimimos no terminal.
   const visivel = { ...dados };
   delete visivel.atualizadoEm;
+  // FieldValue.delete() imprime como "[object Object]" e confunde: o campo não
+  // recebeu um valor estranho, ele foi APAGADO.
+  if (ehVitalicio) visivel.expiracao = "(apagada — vitalício não expira)";
   console.log(`\nAssinatura de ${email} atualizada (uid ${usuario.uid}):`);
   for (const [k, v] of Object.entries(visivel)) console.log(`   ${k.padEnd(10)} ${v}`);
   console.log(

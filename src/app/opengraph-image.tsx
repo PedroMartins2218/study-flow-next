@@ -64,7 +64,7 @@ export default function OpengraphImage() {
               borderRadius: 999,
             }}
           >
-            Acesso de fundador · pré-lançamento
+            A partir de R$ 29,90/mês · cancele quando quiser
           </div>
         </div>
       </div>

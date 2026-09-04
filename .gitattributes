@@ -1,0 +1,24 @@
+# Normaliza o fim de linha do repositório.
+#
+# Por que isto existe: o projeto é editado em duas máquinas Windows, e o git
+# estava convertendo para CRLF na cópia de trabalho. Isso causou dois problemas
+# reais:
+#   1. arquivos apareciam modificados sem ninguém ter mexido neles;
+#   2. edições feitas por script com padrões contendo "\n" não casavam com o
+#      arquivo em "\r\n" e falhavam EM SILÊNCIO — um documento chegou a ficar
+#      pela metade sem ninguém perceber.
+#
+# `text=auto eol=lf` guarda tudo com LF no repositório e entrega LF na cópia de
+# trabalho. Editores modernos no Windows lidam com LF sem problema.
+* text=auto eol=lf
+
+# Binários: nunca converter, senão corrompe.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
