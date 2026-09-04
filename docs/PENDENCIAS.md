@@ -50,26 +50,10 @@ passou por ele.
 
 ## 🟡 Qualidade e higiene
 
-- [ ] **Imagem OG diz "Acesso de fundador · pré-lançamento"**
-      (`opengraph-image.tsx:67`) — é o que aparece ao compartilhar o link no
-      WhatsApp. Trocar antes de divulgar para qualquer pessoa
-- [ ] **5 contas descartáveis no Auth** (de 17 no total):
-      `testador1@example.com`, `testador2@example.com`,
-      `teste-verificacao-claude@studyflow.com`, `yopan@gmail.com`,
-      `henrique@gmail.com`.
-      ⚠️ `testador1` é a conta do print do hero — só apagar depois de não
-      precisar mais recapturar
-- [ ] **7 documentos legados** `usuarios/{email}` ainda no Firestore. Já são
-      inalcançáveis pela regra nova; apagar depois de confirmar que aqueles
-      usuários acessam normalmente
-      (backup em `../backup-usuarios-legado-2026-09-01.json`, fora do repo)
 - [ ] **`public/logo.png`** tem o wordmark "Study Flow" embutido. Nenhum
       componente usa, mas não serve para material de marketing
 - [ ] **Trocar a senha da conta admin** (foi digitada num chat)
 - [ ] **Arrastar e soltar do Kanban** no desktop — nunca testado
-- [ ] **`.gitattributes`** para normalizar fim de linha entre as duas máquinas.
-      Já causou problema real: edições por script com `\n` não casam com
-      arquivos em CRLF e falham em silêncio
 - [ ] **Avisar a testadora** do endereço novo — o antigo responde 404
 
 ---
@@ -101,6 +85,23 @@ passou por ele.
 ---
 
 ## ✅ Concluído
+
+### 02/09/2026
+
+- [x] **Base de dados limpa** — apagadas 14 contas do app antigo e de teste,
+      7 documentos legados `usuarios/{email}` e 15 assinaturas legadas
+      chaveadas por e-mail. Sobraram 13 contas, 13 assinaturas, zero órfãs.
+      **Os e-mails ficaram livres**: provado por teste que apagar a conta libera
+      o endereço para novo cadastro — nada fica bloqueado
+- [x] **12 contas de teste** ativas (`testador1` a `testador12`), todas Pro
+- [x] **Conta pessoal com acesso vitalício** (`pedrinnnho229@gmail.com`)
+- [x] **Copy da imagem OG** — não diz mais "pré-lançamento"
+- [x] **`.gitattributes`** — fecha a armadilha de CRLF entre as duas máquinas
+- [x] **Checkouts da Cakto conferidos num navegador real**: os três carregam
+      com preço e tipo corretos (Base e Pro recorrentes, Vitalício R$ 59,90 à
+      vista). O erro "produto não pode ser vendido" acontece só ao confirmar o
+      pagamento, então é trava de CONTA, não de produto — questão para o
+      suporte da Cakto
 
 ### 01/09/2026
 
