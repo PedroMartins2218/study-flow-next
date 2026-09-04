@@ -1,136 +1,147 @@
 # Nexo Study — o que ainda falta
 
-> Situação em **31/08/2026**. Documento de trabalho: risque o que concluir.
+> Situação em **01/09/2026**, conferida contra a produção e o Firestore.
+> Documento de trabalho: risque o que concluir.
+>
+> O resumo curto está em `docs/RETOMAR-AQUI.md`. Este aqui é a lista longa.
 > O produto se chamava **Study Flow** até 31/08/2026 — ver `CONTEXTO.md`.
 
 ---
 
-## 🟡 Configurar a Cakto (o código já está pronto)
+## 🔴 Bloqueia vender para estranhos
 
-A migração da Kirvano para a **Cakto** foi feita em 31/08/2026 e está testada
-localmente. O que falta é do lado do painel da Cakto e das variáveis:
+### Não existe e-mail de suporte
 
-- [ ] **Cadastrar o webhook** apontando para
-      `https://nexo-study-app-449.netlify.app/api/cakto/webhook`, assinando os
-      eventos: `purchase_approved`, `purchase_refused`, `refund`, `chargeback`,
-      `subscription_created`, `subscription_renewed`,
-      `subscription_renewal_refused`, `subscription_canceled`,
-      `subscription_paused`, `subscription_resumed`
-- [ ] **Copiar o `secret`** que a Cakto gera para o webhook →
-      `CAKTO_WEBHOOK_SECRET`. **Sem ele o endpoint recusa tudo** (falha fechado,
-      de propósito)
-- [ ] **Copiar os links de checkout** das duas ofertas →
-      `NEXT_PUBLIC_CAKTO_CHECKOUT_BASE_URL` e `..._PRO_URL`.
-      ⚠️ São `NEXT_PUBLIC_`: ficam embutidas no build, então **exigem rebuild**
-      depois de cadastradas no Netlify
-- [ ] **Copiar o id de cada oferta** (o valor que vem em `data.offer.id` no
-      payload) → `CAKTO_OFERTA_BASE_ID` e `CAKTO_OFERTA_PRO_ID`.
-      Sem eles, toda compra é tratada como Base — nunca liberamos Pro no escuro
-- [ ] **Criar a oferta vitalícia na Cakto** (pagamento único, não recorrente),
-      copiar o id dela para `CAKTO_OFERTA_VITALICIO_ID` e guardar o link para
-      entregar a dedo. O código já está pronto; sem a variável, nenhuma compra
-      é tratada como vitalícia
-- [ ] **Disparar um evento de teste** pelo painel da Cakto e conferir o log
-- [ ] **Compra real de ponta a ponta** e reembolso depois: checkout →
-      `/obrigado` → cadastro com o mesmo e-mail → acesso liberado sozinho
+`/privacidade` e `/termos` mandam o usuário escrever "para o e-mail de suporte
+informado no rodapé do site". **Não existe nenhum endereço de contato no
+projeto inteiro** — conferido por varredura. Quem quiser exercer os direitos da
+LGPD não tem para onde escrever.
 
-✅ O `.env.local` já está com os **valores reais** das 5 variáveis, conferidos
-em 31/08: os ids das ofertas batem com o final de cada link de checkout, o
-segredo tem formato UUID e os dois links abrem no navegador.
-`CAKTO_OFERTA_VITALICIO_ID` segue vazio — a oferta ainda não existe.
+- [ ] Definir um endereço de suporte
+- [ ] Colocar no rodapé da landing e nas duas páginas legais
 
----
+### O webhook nunca recebeu um evento real
 
-## 🟡 Pendências do Pedro
+O endereço está no ar e recusa corretamente quem não tem o segredo (HTTP 401),
+mas o ledger `pagamentos` está **vazio**: nenhum evento verdadeiro da Cakto
+passou por ele.
 
-- [ ] **Recapturar `public/marketing/dashboard-preview.png`** — o print do hero
-      da landing mostra "Study Flow" na sidebar. Rodar local, logar, capturar de
-      novo. Aproveitar para recortar o nome do usuário, que aparece no print
-      atual
-- [ ] **Fazer o merge da branch `rebrand-nexo-study` na `main`** — enquanto isso
-      não acontece, a produção continua exibindo "Study Flow"
-- [ ] **Redesenhar `public/logo.png`** — tem o wordmark antigo embutido. Sem
-      urgência: nenhum componente usa esse arquivo (só o `logo-mark.png`, que é
-      só o monograma "ST" e continua válido)
-- [ ] **Testar arrastar e soltar no Kanban** (desktop) — não dá para verificar
-      por automação
-- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
-- [ ] **Apagar as contas de teste** quando os testes acabarem
-      (`testador1@example.com` e `testador2@example.com`), no Authentication e
-      nas coleções `assinaturas` e `usuarios`
+- [ ] Conferir na Cakto que o webhook aponta para
+      `https://nexo-study-app-449.netlify.app/api/cakto/webhook` com os 10
+      eventos marcados. **Não criar um segundo** — geraria um segredo novo e
+      quebraria o que está no Netlify
+- [ ] Disparar o evento de teste pelo painel
+- [ ] **Confirmar que o webhook dispara junto com o modo de entrega
+      "Acesso por e-mail"** configurado em 01/09. É a única incógnita real
+- [ ] Compra de verdade ponta a ponta, com reembolso depois
 
----
+### Revisão jurídica
 
-## 🔴 Antes de abrir as vendas
+- [ ] `/privacidade` e `/termos` refletem o que o sistema faz, mas não são
+      parecer de advogado — e o público inclui **menores de idade**, que é onde
+      a LGPD aperta
 
-Validação de segurança **executada em 01/09/2026** — ver `CONTEXTO.md`.
-O que restou:
+### Rotacionar credenciais (véspera do lançamento)
 
-- [ ] **Rotacionar credenciais** na véspera do lançamento: chave da conta de
-      serviço do Firebase, chave do Gemini, `ADMIN_SECRET` e
+- [ ] Chave da conta de serviço do Firebase, chave do Gemini, `ADMIN_SECRET` e
       `CAKTO_WEBHOOK_SECRET`. **Revogar as antigas**, não só gerar novas
-- [ ] **Revisão jurídica** de `/privacidade` e `/termos` — o texto reflete o
-      que o sistema faz, mas não é parecer de advogado
-- [ ] **Preencher o e-mail de suporte** citado nas duas páginas legais
-- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
-- [ ] **Limitador de requisições** — adiado por decisão: as rotas de IA já têm
-      login + plano + cota mensal, e a única rota pública foi removida.
-      Reavaliar quando houver volume real
-- [ ] **Apagar as contas de teste**: `testador1@example.com`,
-      `testador2@example.com` e `teste-verificacao-claude@studyflow.com`
-- [ ] **Apagar os 7 documentos legados** de `usuarios/{email}` depois de
-      confirmar que os usuários acessam normalmente (backup salvo fora do repo)
 
 ---
 
-## ✅ Concluído desde 08/08/2026
+## 🟡 Qualidade e higiene
 
-- [x] **Migração da Kirvano para a Cakto** (31/08) — schema Zod do payload real,
-      mapa explícito dos 16 eventos, idempotência por `data.id` (chave que a
-      própria Cakto recomenda) e validação do `secret` com comparação de tempo
-      constante. Testado localmente: sem segredo → 401, segredo errado → 401,
-      compra aprovada → pendência gravada, reentrega → não duplica,
-      `pix_gerado` → não libera acesso, chargeback → remove a pendência,
-      evento desconhecido → ignorado sem quebrar
-- [x] **Webhook agora falha FECHADO** (31/08) — o da Kirvano devolvia `true`
-      quando a variável de token não estava configurada, ou seja, aceitava
-      qualquer origem. O da Cakto recusa
-- [x] **Variáveis no Netlify** (01/09) — 19 cadastradas, 5 órfãs da Kirvano
-      removidas. `CAKTO_WEBHOOK_SECRET` com valor em Production
-- [x] **Rebrand para Nexo Study** (31/08) — código, metadados e prompt da IA
-- [x] **Site do Netlify renomeado** (31/08) — `study-flow-app-449` →
-      `nexo-study-app-449`. Confirmado: a nova URL responde 200 e a antiga, 404
-- [x] **Publicadas as `firestore.rules`** (20/08) — conferido contra a API de
-      Rules do Google: o ruleset em produção é idêntico ao arquivo local
-- [x] **`ADMIN_SECRET` preenchido** (20/08) — `/admin` destravado
-- [x] **`GEMINI_MODEL` validado** contra a API — `gemini-flash-lite-latest`
-      está entre os 50 modelos visíveis à chave
-- [x] **Modo Foco testado no celular com a tela bloqueada** (31/08) — o
-      cronômetro roda corretamente. Era a única prova real da reescrita que
-      trocou a soma de tiques por `fimEm` + `Date.now()`
-- [x] **Decisão da tipografia encerrada** (31/08) — mantida a pilha do sistema
-      (Arial). A Geist era baixada e nunca usada; o carregamento foi removido,
-      economizando duas requisições ao Google Fonts sem mudar um pixel
-- [x] **`.env.local` reposto** (31/08) após a formatação da máquina, com o
-      Firebase Admin e o Gemini validados por conexão real
-- [x] **Checkout quebrado da Kirvano** — resolvido pela migração; era o
-      JavaScript da própria Kirvano que quebrava antes de desenhar a tela
+- [ ] **Imagem OG diz "Acesso de fundador · pré-lançamento"**
+      (`opengraph-image.tsx:67`) — é o que aparece ao compartilhar o link no
+      WhatsApp. Trocar antes de divulgar para qualquer pessoa
+- [ ] **5 contas descartáveis no Auth** (de 17 no total):
+      `testador1@example.com`, `testador2@example.com`,
+      `teste-verificacao-claude@studyflow.com`, `yopan@gmail.com`,
+      `henrique@gmail.com`.
+      ⚠️ `testador1` é a conta do print do hero — só apagar depois de não
+      precisar mais recapturar
+- [ ] **7 documentos legados** `usuarios/{email}` ainda no Firestore. Já são
+      inalcançáveis pela regra nova; apagar depois de confirmar que aqueles
+      usuários acessam normalmente
+      (backup em `../backup-usuarios-legado-2026-09-01.json`, fora do repo)
+- [ ] **`public/logo.png`** tem o wordmark "Study Flow" embutido. Nenhum
+      componente usa, mas não serve para material de marketing
+- [ ] **Trocar a senha da conta admin** (foi digitada num chat)
+- [ ] **Arrastar e soltar do Kanban** no desktop — nunca testado
+- [ ] **`.gitattributes`** para normalizar fim de linha entre as duas máquinas.
+      Já causou problema real: edições por script com `\n` não casam com
+      arquivos em CRLF e falham em silêncio
+- [ ] **Avisar a testadora** do endereço novo — o antigo responde 404
+
+---
+
+## 🟢 Decisões em aberto
+
+- **Trial de fundador:** ainda ativo, com **6 e-mails** elegíveis na coleção
+  `reservas`. Manter, encerrar ou virar cortesia?
+- **Limitador de requisições:** adiado conscientemente — as rotas de IA já têm
+  login + plano + cota mensal, e a única rota pública foi removida
+- **Identidade visual do ecossistema Nexo (preto e branco):** adiada para
+  depois do lançamento
+- **Domínio próprio:** o `.netlify.app` é provisório
+- **Renomear o repositório GitHub** para `nexo-study` — o GitHub redireciona,
+  mas o Netlify precisa ser reconectado
 
 ---
 
 ## 💡 Ideias registradas, sem data
 
-- Toggle **lista ↔ quadro** nas telas de Atividades e Trabalhos (hoje só quadro)
+- Toggle **lista ↔ quadro** em Atividades e Trabalhos (hoje só quadro)
 - **Anexos em PDF** no caderno (hoje só imagem; PDF exigiria Firebase Storage,
   que pede plano pago)
-- **E-mail transacional** (Resend): confirmação de compra e aviso de inadimplência
+- **E-mail transacional próprio** (Resend) — deixou de ser urgente, já que a
+  Cakto entrega o acesso por e-mail. Ainda útil para aviso de inadimplência
 - **Firebase App Check**
-- **Domínio próprio** — natural agora que a marca mudou; o `.netlify.app` é
-  provisório
-- **Identidade visual do ecossistema Nexo (preto e branco)** — a marca Nexo é
-  P&B, enquanto o produto é azul. Alinhar os dois é possível, mas dá trabalho
-  real (paleta, tema escuro, logo, print, peças). **Decisão adiada para depois
-  do lançamento** — hoje o azul fica
 - Notificações com o app fechado (FCM)
-- **Renomear o repositório GitHub** para `nexo-study` — o GitHub redireciona
-  sozinho, mas o Netlify precisa ser reconectado ao repo. Não vale o risco agora
+
+---
+
+## ✅ Concluído
+
+### 01/09/2026
+
+- [x] **Deploy em produção** — `main` em `785c3e8`. Verificado por navegador
+      automatizado: login funciona, as 10 telas carregam, **zero erros de
+      JavaScript**, dashboard sem NaN
+- [x] **Validação de segurança** — A1, A3, A4, A5, C1, C2, E1, E2, F1 passaram;
+      A2, B2, C3, D1, D4 corrigidos. Detalhes no `CONTEXTO.md`
+- [x] **A2** — a regra do Firestore aceitava e-mail não verificado como dono.
+      7 usuários migrados, regra reduzida a `uid`, publicada. Ataque controlado
+      devolve 403
+- [x] **B2** — compra podia ser reivindicada por quem registrasse o e-mail
+      primeiro. Agora exige e-mail confirmado, só quando há compra pendente
+- [x] **LGPD** — `/privacidade`, `/termos`, exclusão de conta (testada com
+      subcoleções de dois níveis) e aviso do Gemini
+- [x] **Variáveis no Netlify** — 19 cadastradas, 5 órfãs da Kirvano removidas
+- [x] **Entrega do acesso ao comprador** — resolvida sem código: a Cakto tem o
+      modo "Acesso por e-mail", que manda o link no e-mail de Pagamento
+      Confirmado
+- [x] **Print do hero recapturado** — a captura revelou dois bugs reais, também
+      corrigidos: o gráfico "Foco · últimos 7 dias" **nunca renderizou**
+      (altura em porcentagem sobre pai sem altura) e o "Foco hoje" exibia
+      "NaNh NaNmin"
+
+### 31/08/2026
+
+- [x] **Rebrand para Nexo Study** — código, metadados e prompt da IA
+- [x] **Migração da Kirvano para a Cakto** — schema Zod do payload real, mapa
+      explícito dos 16 eventos, idempotência por `data.id`, validação do
+      `secret` com comparação de tempo constante
+- [x] **Webhook falha FECHADO** — o da Kirvano aceitava qualquer origem quando
+      a variável não estava configurada
+- [x] **Plano vitalício** — compra única com acesso Pro permanente, por link
+      avulso
+- [x] **Site do Netlify renomeado** — `study-flow-app-449` → `nexo-study-app-449`
+- [x] **Decisão da tipografia** — mantida a pilha do sistema; a Geist era
+      baixada e nunca usada
+- [x] **Modo Foco testado no celular** com a tela bloqueada
+- [x] **`.env.local` reposto** após a formatação da máquina
+
+### Antes
+
+- [x] **`firestore.rules` publicadas** (20/08), conferidas contra a API do Google
+- [x] **Checkout quebrado da Kirvano** — resolvido pela migração
