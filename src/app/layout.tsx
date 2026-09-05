@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AuthProvider } from "@/lib/auth/AuthProvider";
+import { TemaPorRota } from "@/components/TemaPorRota";
 import "./globals.css";
 
 // A tipografia do app é a pilha do sistema (Arial), definida no globals.css.
@@ -38,13 +39,21 @@ export default function RootLayout({
       className="h-full antialiased"
     >
       <body className="min-h-full flex flex-col bg-slate-50">
-        {/* Aplica o tema escuro antes da primeira pintura, evitando "flash" */}
+        {/* Aplica o tema escuro antes da primeira pintura, evitando "flash".
+            A lista de rotas públicas é a mesma de lib/ui/tema.ts — precisa
+            ficar duplicada aqui porque este script roda antes de qualquer
+            JavaScript da aplicação carregar. Mudou lá? Muda aqui também. */}
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{if(localStorage.getItem('sf_tema')==='escuro')document.documentElement.classList.add('dark')}catch(e){}",
+              "try{var p=location.pathname.replace(/\\/+$/,'')||'/';" +
+              "var pub=['/login','/privacidade','/termos','/obrigado','/admin'];" +
+              "var app=p!=='/'&&!pub.some(function(x){return p===x||p.indexOf(x+'/')===0});" +
+              "if(app&&localStorage.getItem('sf_tema')==='escuro')" +
+              "document.documentElement.classList.add('dark')}catch(e){}",
           }}
         />
+        <TemaPorRota />
         <AuthProvider>{children}</AuthProvider>
       </body>
     </html>

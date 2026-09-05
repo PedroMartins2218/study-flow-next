@@ -38,6 +38,14 @@ body {
 .dark .text-slate-900 {
   color: #f1f5f9;
 }
+/* O 800 estava faltando e sumia no escuro: a resposta do Agente de IA usa
+   `bg-slate-100 text-slate-800`, o fundo virava escuro pela regra acima e o
+   texto continuava cinza-escuro — ficava ilegível. Lembrete de que estas
+   regras casam pelo NOME EXATO da classe: usar um tom que não esteja listado
+   aqui é como o texto some. */
+.dark .text-slate-800 {
+  color: #e2e8f0;
+}
 .dark .text-slate-700 {
   color: #cbd5e1;
 }
