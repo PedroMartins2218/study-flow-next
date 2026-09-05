@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Logo } from "@/components/marketing/Logo";
+import { EMAIL_SUPORTE, mailtoSuporte } from "@/lib/contato";
 
 export const metadata: Metadata = {
   title: "Política de Privacidade — Nexo Study",
@@ -43,8 +44,14 @@ export default function PrivacidadePage() {
             <p className="mt-3">
               O Nexo Study é operado por Pedro Martins, desenvolvedor
               independente. Para qualquer assunto sobre seus dados — inclusive
-              pedidos de acesso, correção ou exclusão — o contato é o e-mail de
-              suporte informado no rodapé do site.
+              pedidos de acesso, correção ou exclusão — escreva para{" "}
+              <a
+                href={mailtoSuporte("Dados pessoais — Nexo Study")}
+                className="font-medium text-blue-600 hover:text-blue-700"
+              >
+                {EMAIL_SUPORTE}
+              </a>
+              .
             </p>
           </section>
 
@@ -177,7 +184,14 @@ export default function PrivacidadePage() {
               <strong>Se você tem menos de 18 anos, use o Nexo Study com o
               conhecimento e o consentimento dos seus pais ou responsáveis.</strong>{" "}
               Responsáveis podem, a qualquer momento, pedir acesso aos dados do
-              menor ou a exclusão da conta pelo e-mail de suporte.
+              menor ou a exclusão da conta escrevendo para{" "}
+              <a
+                href={mailtoSuporte("Dados de menor de idade — Nexo Study")}
+                className="font-medium text-blue-600 hover:text-blue-700"
+              >
+                {EMAIL_SUPORTE}
+              </a>
+              .
             </p>
             <p className="mt-3">
               Não coletamos mais dados de menores do que de qualquer outro
@@ -204,8 +218,14 @@ export default function PrivacidadePage() {
                 permanente e imediata, sem precisar pedir a ninguém.
               </li>
               <li>
-                <strong>Qualquer outro pedido:</strong> pelo e-mail de suporte.
-                Respondemos em até 15 dias.
+                <strong>Qualquer outro pedido:</strong> escreva para{" "}
+                <a
+                  href={mailtoSuporte("Direitos LGPD — Nexo Study")}
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  {EMAIL_SUPORTE}
+                </a>
+                . Respondemos em até 15 dias.
               </li>
             </ul>
             <p className="mt-3">

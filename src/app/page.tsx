@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Logo } from "@/components/marketing/Logo";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { PLANOS } from "@/lib/planos";
+import { EMAIL_SUPORTE, mailtoSuporte } from "@/lib/contato";
 import dashboardPreview from "../../public/marketing/dashboard-preview.png";
 
 const DORES = [
@@ -481,6 +482,10 @@ export default function LandingPage() {
             <Link href="/termos" className="hover:text-slate-800">
               Termos de Uso
             </Link>
+            <span className="text-slate-300"> · </span>
+            <a href={mailtoSuporte()} className="hover:text-slate-800">
+              {EMAIL_SUPORTE}
+            </a>
           </p>
           <p className="max-w-xl text-xs text-slate-400">
             Menores de 18 anos devem usar o serviço com o consentimento dos pais

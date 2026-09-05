@@ -6,6 +6,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { usePerfil } from "@/lib/perfil/PerfilProvider";
 import { salvarFotoPerfil, removerFotoPerfil } from "@/lib/data/perfil";
 import { useToast } from "@/components/ui/Toast";
+import { mailtoSuporte } from "@/lib/contato";
 import { comprimirImagem, IMAGEM_PERFIL } from "@/lib/ui/imagem";
 import {
   lerPrefs,
@@ -369,6 +370,10 @@ export default function ConfiguracoesPage() {
         {" · "}
         <a href="/termos" className="hover:text-slate-600">
           Termos de Uso
+        </a>
+        {" · "}
+        <a href={mailtoSuporte("Suporte — Nexo Study")} className="hover:text-slate-600">
+          Falar com o suporte
         </a>
       </p>
     </div>

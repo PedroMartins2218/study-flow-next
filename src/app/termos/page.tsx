@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Logo } from "@/components/marketing/Logo";
 import { PLANOS } from "@/lib/planos";
+import { EMAIL_SUPORTE, mailtoSuporte } from "@/lib/contato";
 
 export const metadata: Metadata = {
   title: "Termos de Uso — Nexo Study",
@@ -117,7 +118,14 @@ export default function TermosPage() {
                 <strong>Arrependimento:</strong> como manda o art. 49 do Código
                 de Defesa do Consumidor, você pode desistir da compra em até{" "}
                 <strong>7 dias corridos</strong> e receber o valor de volta.
-                Basta pedir pelo e-mail de suporte.
+                Basta pedir para{" "}
+                <a
+                  href={mailtoSuporte("Solicitação de reembolso — Nexo Study")}
+                  className="font-medium text-blue-600 hover:text-blue-700"
+                >
+                  {EMAIL_SUPORTE}
+                </a>
+                .
               </li>
               <li>
                 Em caso de reembolso ou contestação de pagamento, o acesso é
