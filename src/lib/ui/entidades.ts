@@ -16,4 +16,5 @@ export const ENTIDADES: Record<string, EntidadeVisual> = {
   provas: { chip: "bg-red-500/10 text-red-600", ponto: "bg-red-500", icone: "calendario" },
   foco: { chip: "bg-emerald-500/10 text-emerald-600", ponto: "bg-emerald-500", icone: "relogio" },
   caderno: { chip: "bg-indigo-500/10 text-indigo-600", ponto: "bg-indigo-500", icone: "caderno" },
+  redacao: { chip: "bg-rose-500/10 text-rose-600", ponto: "bg-rose-500", icone: "redacao" },
 };

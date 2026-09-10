@@ -50,6 +50,8 @@ export const PLANO_PRO: Plano = {
     "Agente de IA: cole o edital ou plano de ensino e ele extrai as tarefas",
     "Datas de provas e trabalhos identificadas e agendadas automaticamente",
     "Revisão do que a IA sugeriu antes de salvar — você tem a palavra final",
+    "Correção de redação nas 5 competências do ENEM, com nota e devolutiva",
+    "Verificação de cópia dos textos motivadores e registro de como você escreveu",
   ],
 };
 

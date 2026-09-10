@@ -187,6 +187,127 @@ export const chatIaInputSchema = z.object({
 
 export type ChatIaInput = z.infer<typeof chatIaInputSchema>;
 
+// --- Redação ----------------------------------------------------------------
+
+export const provenienciaSchema = z.object({
+  caracteresDigitados: z.coerce.number().int().min(0).max(1_000_000),
+  caracteresColados: z.coerce.number().int().min(0).max(1_000_000),
+  eventosColagem: z.coerce.number().int().min(0).max(10_000),
+  tempoEdicaoSegundos: z.coerce.number().int().min(0).max(86_400),
+  origem: z.enum(["digitado", "misto", "colado"]),
+});
+
+export const corrigirRedacaoInputSchema = z.object({
+  tema: z
+    .string()
+    .trim()
+    .min(5, "Informe o tema da redação")
+    .max(300, "Tema longo demais"),
+  // O piso é baixo de propósito: uma redação de 3 linhas PRECISA ser aceita
+  // para o corretor poder dizer que ela zeraria por texto insuficiente —
+  // barrar aqui esconderia justamente a informação mais útil. O teto é
+  // controle de custo (redação de ENEM tem 30 linhas, ~3.000 caracteres).
+  texto: z
+    .string()
+    .trim()
+    .min(50, "Escreva um pouco mais antes de enviar para correção")
+    .max(6000, "Texto longo demais — a redação do ENEM tem no máximo 30 linhas"),
+  textoMotivador: z
+    .string()
+    .trim()
+    .max(5000, "Textos motivadores longos demais — cole no máximo ~5.000 caracteres")
+    .optional()
+    .default(""),
+  proveniencia: provenienciaSchema,
+});
+
+export type CorrigirRedacaoInput = z.infer<typeof corrigirRedacaoInputSchema>;
+
+/**
+ * Saída crua do modelo. Repare que NÃO há `nota` nem `notaTotal`: o modelo
+ * devolve só o nível (0–5) e a aritmética é feita no nosso código. LLM erra
+ * conta, e uma soma errada aqui destruiria a confiança na nota inteira.
+ */
+// Três coisas NÃO estão aqui de propósito, porque não são julgamento e sim
+// consequência, e o modelo erra todas as três:
+//   `nota`/`notaTotal` — aritmética (nivel * 40 e a soma), feita no código;
+//   `zerada`           — anulação, derivada do tamanho do texto e do nível 0
+//                        da C2. Com um campo livre, o modelo anulava por
+//                        impulso: na aferição, a mesma redação forte foi
+//                        anulada em 2 de 3 execuções.
+// Os tetos de lista são folgados: modelo prolixo não pode invalidar uma
+// correção boa e queimar a chamada paga. Quem apara é `corrigirRedacao`.
+export const correcaoIaSchema = z.object({
+  competencias: z
+    .array(
+      z.object({
+        numero: z.union([
+          z.literal(1),
+          z.literal(2),
+          z.literal(3),
+          z.literal(4),
+          z.literal(5),
+        ]),
+        evidencias: z.array(z.string().trim().min(1).max(400)).max(12),
+        diagnostico: z.string().trim().min(1).max(900),
+        nivel: z.coerce.number().int().min(0).max(5),
+      })
+    )
+    .min(5, "a correção precisa cobrir as cinco competências")
+    .max(10),
+  pontosFortes: z.array(z.string().trim().min(1).max(300)).max(12).optional().default([]),
+  proximosPassos: z.array(z.string().trim().min(1).max(300)).max(12).optional().default([]),
+  indiciosIa: z.object({
+    nivel: z.enum(["baixo", "medio", "alto"]),
+    sinais: z.array(z.string().trim().min(1).max(300)).max(12).optional().default([]),
+  }),
+});
+
+export type CorrecaoIa = z.infer<typeof correcaoIaSchema>;
+
+const trechoCopiadoSchema = z.object({
+  texto: z.string().trim().min(1).max(500),
+  fonte: z.string().trim().min(1).max(120),
+});
+
+const competenciaAvaliadaSchema = z.object({
+  numero: z.union([z.literal(1), z.literal(2), z.literal(3), z.literal(4), z.literal(5)]),
+  evidencias: z.array(z.string().trim().max(400)).max(4),
+  diagnostico: z.string().trim().max(900),
+  nivel: z.coerce.number().int().min(0).max(5),
+  nota: z.coerce.number().int().min(0).max(200),
+});
+
+/** O que é gravado em `usuarios/{uid}/redacoes`. */
+export const redacaoInputSchema = z.object({
+  tema: z.string().trim().min(1).max(300),
+  texto: z.string().trim().min(1).max(6000),
+  textoMotivador: z.string().trim().max(5000).optional().default(""),
+  correcao: z.object({
+    competencias: z.array(competenciaAvaliadaSchema).length(5),
+    notaTotal: z.coerce.number().int().min(0).max(1000),
+    pontosFortes: z.array(z.string().trim().max(300)).max(5),
+    proximosPassos: z.array(z.string().trim().max(300)).max(5),
+    zerada: z
+      .object({
+        motivo: z.enum(["fuga_ao_tema", "tipo_textual", "texto_insuficiente", "copia_integral"]),
+        explicacao: z.string().trim().max(600),
+      })
+      .optional(),
+    indiciosIa: z.object({
+      nivel: z.enum(["baixo", "medio", "alto"]),
+      sinais: z.array(z.string().trim().max(300)).max(5),
+    }),
+  }),
+  plagio: z.object({
+    percentual: z.coerce.number().int().min(0).max(100),
+    trechos: z.array(trechoCopiadoSchema).max(5),
+  }),
+  proveniencia: provenienciaSchema,
+});
+
+export type RedacaoInput = z.infer<typeof redacaoInputSchema>;
+
 export const resumirIaInputSchema = z.object({
   texto: z
     .string()

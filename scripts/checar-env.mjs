@@ -43,6 +43,11 @@ const GRUPOS = [
     chaves: ["GEMINI_API_KEY", "GEMINI_MODEL", "IA_LIMITE_PRO"],
   },
   {
+    nome: "Correcao de redacao - modelo dedicado (opcional)",
+    obrigatorio: false,
+    chaves: ["GEMINI_MODEL_REDACAO"],
+  },
+  {
     nome: "Cakto — oferta vitalícia (opcional)",
     obrigatorio: false,
     chaves: ["CAKTO_OFERTA_VITALICIO_ID"],

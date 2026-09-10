@@ -10,6 +10,7 @@
     "migrar:legado": "node --env-file=.env.local scripts/migrar-dados-legado.mjs",
     "assinatura": "node --env-file=.env.local scripts/definir-assinatura.mjs",
     "checar-env": "node --env-file=.env.local scripts/checar-env.mjs",
+    "aferir": "node --env-file=.env.local --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/lib/alias-loader.mjs scripts/aferir-redacao.mjs",
     "netlify-env": "node --env-file=.env.local scripts/netlify-env.mjs"
   },
   "dependencies": {

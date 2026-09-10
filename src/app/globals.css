@@ -160,10 +160,23 @@ body {
       transform: none;
     }
   }
+  /* Mascote do painel: sobe e desce de leve, como se estivesse flutuando.
+     `alternate` volta pelo mesmo caminho, então o movimento não tem repique. */
+  @keyframes sf-flutuar {
+    from {
+      transform: translateY(0);
+    }
+    to {
+      transform: translateY(-8px);
+    }
+  }
   .animate-in {
     animation: sf-fade-up 0.35s ease-out both;
   }
   .toast-in {
     animation: sf-toast-in 0.25s ease-out both;
+  }
+  .mascote-flutuando {
+    animation: sf-flutuar 3s ease-in-out infinite alternate;
   }
 }

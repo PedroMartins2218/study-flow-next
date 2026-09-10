@@ -7,6 +7,7 @@ import { useAuth } from "@/lib/auth/AuthProvider";
 import { usePerfil } from "@/lib/perfil/PerfilProvider";
 import { Logo } from "@/components/marketing/Logo";
 import { Icone } from "@/components/ui/Icone";
+import { Mascote } from "@/components/Mascote";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icone: "dashboard" },
@@ -17,6 +18,7 @@ const NAV_ITEMS = [
   { href: "/caderno", label: "Caderno", icone: "caderno" },
   { href: "/graficos", label: "Gráficos", icone: "grafico" },
   { href: "/foco", label: "Foco", icone: "alvo" },
+  { href: "/redacao", label: "Redação", icone: "redacao" },
   { href: "/ia", label: "Agente IA", icone: "ia" },
 ] as const;
 
@@ -137,13 +139,26 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         {/* Header (mobile) */}
         <header className="flex items-center justify-between bg-slate-950 px-4 py-3 sm:hidden">
           <Logo tone="light" />
-          <Link href="/configuracoes" aria-label="Configurações">
-            <Avatar tamanho="h-8 w-8" foto={foto} fallback={fallbackAvatar} />
-          </Link>
+          <div className="flex items-center gap-2">
+            {/* No celular o mascote mora dentro do header: não sobra margem na
+                tela para ele flutuar solto sem cobrir os botões das telas. */}
+            <Mascote className="h-10" />
+            <Link href="/configuracoes" aria-label="Configurações">
+              <Avatar tamanho="h-8 w-8" foto={foto} fallback={fallbackAvatar} />
+            </Link>
+          </div>
         </header>
 
+        {/* No desktop o mascote flutua fixo no canto superior direito, sempre
+            visível. O pr-28 abaixo reserva a faixa que ele ocupa, para ele não
+            passar por cima do botão de ação do PageHeader.
+            z-30: acima do conteúdo, abaixo da nav (z-40) e dos modais (z-50+). */}
+        <div className="pointer-events-none fixed right-6 top-5 z-30 hidden sm:block">
+          <Mascote className="h-20 drop-shadow-[0_10px_20px_rgba(15,23,42,0.18)]" />
+        </div>
+
         {/* pb extra no mobile para o conteúdo não ficar atrás da nav fixa */}
-        <main className="flex-1 p-4 pb-24 sm:p-8">{children}</main>
+        <main className="flex-1 p-4 pb-24 sm:p-8 sm:pr-28">{children}</main>
 
         {/* Nav inferior fixa (mobile) — 4 destinos + Mais, sem scroll lateral */}
         <nav
